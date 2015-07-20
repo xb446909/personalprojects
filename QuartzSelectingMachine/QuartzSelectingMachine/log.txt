@@ -1,0 +1,5 @@
+Open OK!
+Received WM_HID_WRITE Message
+VID = 0x483, PID = 0x5750, size = 12
+Data: 5B  8  0  0  7  0  0  0  7A  E  0  0  
+Write Successfully!
