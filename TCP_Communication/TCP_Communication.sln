@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TCP_Server", "TCP_Server\TCP_Server.vcxproj", "{F8B33F41-63CC-4FB0-8230-FC42922B3B46}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TCP_Client", "TCP_Client\TCP_Client.vcxproj", "{532051AE-AE78-4C56-B501-12B9BEBD88CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F8B33F41-63CC-4FB0-8230-FC42922B3B46}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F8B33F41-63CC-4FB0-8230-FC42922B3B46}.Debug|Win32.Build.0 = Debug|Win32
+		{F8B33F41-63CC-4FB0-8230-FC42922B3B46}.Release|Win32.ActiveCfg = Release|Win32
+		{F8B33F41-63CC-4FB0-8230-FC42922B3B46}.Release|Win32.Build.0 = Release|Win32
+		{532051AE-AE78-4C56-B501-12B9BEBD88CB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{532051AE-AE78-4C56-B501-12B9BEBD88CB}.Debug|Win32.Build.0 = Debug|Win32
+		{532051AE-AE78-4C56-B501-12B9BEBD88CB}.Release|Win32.ActiveCfg = Release|Win32
+		{532051AE-AE78-4C56-B501-12B9BEBD88CB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
