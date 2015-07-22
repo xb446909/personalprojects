@@ -147,6 +147,7 @@ CFLAGS-openchild.c = -fexceptions
 sunrpc-CPPFLAGS = -D_RPC_THREAD_SAFE_
 CPPFLAGS += $(sunrpc-CPPFLAGS)
 BUILD_CPPFLAGS += $(sunrpc-CPPFLAGS)
+BUILD_LDFLAGS = -lintl
 
 $(objpfx)tst-getmyaddr: $(common-objpfx)linkobj/libc.so
 $(objpfx)tst-xdrmem: $(common-objpfx)linkobj/libc.so
