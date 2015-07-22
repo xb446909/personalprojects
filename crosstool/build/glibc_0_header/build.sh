@@ -7,15 +7,15 @@ SYSDIR=$TOOLSDIR/crosstools/arm-none-linux-gnueabi/libc
 
 TARGET=arm-none-linux-gnueabi
 
-CC="$TARGET-gcc"         \
-CXX="$TARGET-g++"        \
+CC="$TARGET-gcc -march=armv7-a -mthumb"         \
+CXX="$TARGET-g++ -march=armv7-a -mthumb"        \
 CFLAGS="-g -O2"                                 \
 AR=$TARGET-ar                                   \
 NM=$TARGET-nm                                   \
 RANLIB=$TARGET-ranlib                           \
 READELF=$TARGET-readelf                         \
 $SRCDIR/glibc-2.21/configure                    \
-       --host=$TARGE                            \
+       --host=$TARGET                           \
        --prefix=/usr                            \
        --with-headers=$SYSDIR/usr/include       \
        --disable-profile                        \
@@ -26,9 +26,9 @@ $SRCDIR/glibc-2.21/configure                    \
        libc_cv_ctros_header=yes                 \
        libc_cv_c_cleanup=yes
 
-#make install_root=$SYSDIR install-bootstrap-headers=yes install-headers
-#make csu/subdir_lib
-#mkdir $SYSDIR/usr/lib -p
-#cp csu/crt1.o csu/crti.o csu/crtn.o $SYSDIR/usr/lib/
-#$CC -o $SYSDIR/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
+make install_root=$SYSDIR install-bootstrap-headers=yes install-headers
+make csu/subdir_lib
+mkdir $SYSDIR/usr/lib -p
+cp csu/crt1.o csu/crti.o csu/crtn.o $SYSDIR/usr/lib/
+$TARGET-gcc -march=armv7-a -mthumb -o $SYSDIR/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
 
