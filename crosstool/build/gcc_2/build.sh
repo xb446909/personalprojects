@@ -16,7 +16,6 @@ $SRCDIR/gcc-5.2.0/configure                     \
         --with-sysroot=$SYSDIR                  \
         --with-build-time-tools=$SYSDIR/../bin  \
         --enable-threads                        \
-        --without-headers                       \
         --disable-nls                           \
         --disable-libmudflap                    \
         --enable-shared                         \
@@ -30,5 +29,5 @@ $SRCDIR/gcc-5.2.0/configure                     \
         --enable-languages=c,c++
 
 
-make all -j8
+make -j8
 make install

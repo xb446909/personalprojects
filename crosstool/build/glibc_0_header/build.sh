@@ -26,9 +26,9 @@ $SRCDIR/glibc-2.21/configure                    \
        libc_cv_ctros_header=yes                 \
        libc_cv_c_cleanup=yes
 
-make -k install_root=$SYSDIR/default cross_compiling=yes install-headers
+make install_root=$SYSDIR install-bootstrap-headers=yes install-headers
 make csu/subdir_lib
 mkdir $SYSDIR/usr/lib -p
-cp csu/crt1.o csu/crti.o csu/crtn.o $SYSDIR/usr/lib/
+cp csu/crt1.o csu/crti.o csu/crtn.o $SYSDIR/usr/lib/ -f
 $TARGET-gcc -march=armv7-a -mthumb -o $SYSDIR/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
 
