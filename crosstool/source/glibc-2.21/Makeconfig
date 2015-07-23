@@ -469,7 +469,7 @@ else
 link-libc-tests-rpath-link = $(link-libc-rpath-link)
 endif
 link-libc-before-gnulib = $(common-objpfx)libc.so$(libc.so-version) \
-			  $(common-objpfx)$(patsubst %,$(libtype.oS),c) \
+			  $(common-objpfx)$(patsubst %,$(libtype.oZ),c) \
 			  $(as-needed) $(elf-objpfx)ld.so \
 			  $(no-as-needed)
 link-libc = $(link-libc-rpath-link) $(link-libc-before-gnulib) $(gnulib)
@@ -873,7 +873,7 @@ endif
 # The compilation rules use $(CPPFLAGS-${SUFFIX}) and $(CFLAGS-${SUFFIX})
 # to pass different flags for each flavor.
 libtypes = $(foreach o,$(object-suffixes-for-libc),$(libtype$o))
-all-object-suffixes := .o .os .op .og .oS
+all-object-suffixes := .o .os .op .og .oZ
 object-suffixes :=
 CPPFLAGS-.o = $(pic-default)
 CFLAGS-.o = $(filter %frame-pointer,$(+cflags))
@@ -912,14 +912,14 @@ object-suffixes-for-libc := $(object-suffixes)
 
 ifeq (yes,$(build-shared))
 # Build special library that contains the static-only routines for libc.
-object-suffixes-for-libc += .oS
+object-suffixes-for-libc += .oZ
 
 # Must build the routines as PIC, though, because they can end up in (users')
 # shared objects.  We don't want to use CFLAGS-os because users may, for
 # example, make that processor-specific.
-CFLAGS-.oS = $(CFLAGS-.o) $(PIC-ccflag)
-CPPFLAGS-.oS = $(CPPFLAGS-.o) -DPIC -DLIBC_NONSHARED=1
-libtype.oS = lib%_nonshared.a
+CFLAGS-.oZ = $(CFLAGS-.o) $(PIC-ccflag)
+CPPFLAGS-.oZ = $(CPPFLAGS-.o) -DPIC -DLIBC_NONSHARED=1
+libtype.oZ = lib%_nonshared.a
 endif
 
 # The assembler can generate debug information too.

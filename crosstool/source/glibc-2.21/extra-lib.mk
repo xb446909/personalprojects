@@ -13,7 +13,7 @@ object-suffixes-$(lib) := $(filter-out $($(lib)-inhibit-o),$(object-suffixes))
 
 ifneq (,$($(lib)-static-only-routines))
 ifneq (,$(filter yes%,$(build-shared)$($(lib).so-version)))
-object-suffixes-$(lib) += $(filter-out $($(lib)-inhibit-o),.oS)
+object-suffixes-$(lib) += $(filter-out $($(lib)-inhibit-o),.oZ)
 endif
 endif
 
@@ -29,7 +29,7 @@ all-$(lib)-routines := $($(lib)-routines) $($(lib)-sysdep_routines)
 
 # Add each flavor of library to the lists of things to build and install.
 install-lib += $(foreach o,$(object-suffixes-$(lib)),$(lib:lib%=$(libtype$o)))
-extra-objs += $(foreach o,$(filter-out .os .oS,$(object-suffixes-$(lib))),\
+extra-objs += $(foreach o,$(filter-out .os .oZ,$(object-suffixes-$(lib))),\
 			$(patsubst %,%$o,$(filter-out \
 					   $($(lib)-shared-only-routines),\
 					   $(all-$(lib)-routines))))
@@ -37,8 +37,8 @@ ifneq (,$(filter .os,$(object-suffixes-$(lib))))
 extra-objs += $(patsubst %,%.os,$(filter-out $($(lib)-static-only-routines),\
 					     $(all-$(lib)-routines)))
 endif
-ifneq (,$(filter .oS,$(object-suffixes-$(lib))))
-extra-objs += $(patsubst %,%.oS,$(filter $($(lib)-static-only-routines),\
+ifneq (,$(filter .oZ,$(object-suffixes-$(lib))))
+extra-objs += $(patsubst %,%.oZ,$(filter $($(lib)-static-only-routines),\
 					 $(all-$(lib)-routines)))
 endif
 alltypes-$(lib) := $(foreach o,$(object-suffixes-$(lib)),\
@@ -62,7 +62,7 @@ endif
 
 
 # Use o-iterator.mk to generate a rule for each flavor of library.
-ifneq (,$(filter-out .os .oS,$(object-suffixes-$(lib))))
+ifneq (,$(filter-out .os .oZ,$(object-suffixes-$(lib))))
 define o-iterator-doit
 $(objpfx)$(patsubst %,$(libtype$o),$(lib:lib%=%)): \
   $(patsubst %,$(objpfx)%$o,\
@@ -70,7 +70,7 @@ $(objpfx)$(patsubst %,$(libtype$o),$(lib:lib%=%)): \
 			  $(all-$(lib)-routines))); \
 	$$(build-extra-lib)
 endef
-object-suffixes-left = $(filter-out .os .oS,$(object-suffixes-$(lib)))
+object-suffixes-left = $(filter-out .os .oZ,$(object-suffixes-$(lib)))
 include $(patsubst %,$(..)o-iterator.mk,$(object-suffixes-left))
 endif
 
@@ -82,9 +82,9 @@ $(objpfx)$(patsubst %,$(libtype.os),$(lib:lib%=%)): \
 	$(build-extra-lib)
 endif
 
-ifneq (,$(filter .oS,$(object-suffixes-$(lib))))
-$(objpfx)$(patsubst %,$(libtype.oS),$(lib:lib%=%)): \
-  $(patsubst %,$(objpfx)%.oS,\
+ifneq (,$(filter .oZ,$(object-suffixes-$(lib))))
+$(objpfx)$(patsubst %,$(libtype.oZ),$(lib:lib%=%)): \
+  $(patsubst %,$(objpfx)%.oZ,\
 	     $(filter $($(lib)-static-only-routines),\
 		      $(all-$(lib)-routines)))
 	$(build-extra-lib)
