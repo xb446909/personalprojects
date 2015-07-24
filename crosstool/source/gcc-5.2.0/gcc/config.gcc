@@ -1053,6 +1053,16 @@ arm*-*-linux-*)			# ARM GNU/Linux with ELF
 	# The EABI requires the use of __cxa_atexit.
 	default_use_cxa_atexit=yes
 	with_tls=${with_tls:-gnu}
+    case ${target} in
+        *)
+	    if test x$enable_extra_sgxx_multilibs = xyes; then
+		tm_file="${tm_file} arm/cs-linux.h"
+		tmake_file="${tmake_file} arm/t-cs-linux"
+	    fi
+	    tm_file="$tm_file ./sysroot-suffix.h"
+	    tmake_file="$tmake_file t-sysroot-suffix"
+	    ;;
+	esac
 	;;
 arm*-*-uclinux*eabi*)		# ARM ucLinux
 	tm_file="dbxelf.h elfos.h arm/unknown-elf.h arm/elf.h arm/linux-gas.h arm/uclinux-elf.h glibc-stdint.h"

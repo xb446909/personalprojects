@@ -7,8 +7,8 @@ SYSDIR=$TOOLSDIR/crosstools/arm-none-linux-gnueabi/libc
 
 TARGET=arm-none-linux-gnueabi
 
-CC="$TARGET-gcc -march=armv7-a -mthumb"         \
-CXX="$TARGET-g++ -march=armv7-a -mthumb"        \
+CC="$TARGET-gcc"                                \
+CXX="$TARGET-g++"                               \
 CFLAGS="-g -O2"                                 \
 AR=$TARGET-ar                                   \
 NM=$TARGET-nm                                   \
@@ -30,5 +30,5 @@ make install_root=$SYSDIR install-bootstrap-headers=yes install-headers
 make csu/subdir_lib
 mkdir $SYSDIR/usr/lib -p
 cp csu/crt1.o csu/crti.o csu/crtn.o $SYSDIR/usr/lib/ -f
-$TARGET-gcc -march=armv7-a -mthumb -o $SYSDIR/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
+$TARGET-gcc -o $SYSDIR/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
 

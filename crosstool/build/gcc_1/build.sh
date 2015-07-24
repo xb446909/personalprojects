@@ -24,8 +24,8 @@ $SRCDIR/gcc-5.2.0/configure                     \
         --disable-decimal-float                 \
         --disable-libssp                        \
         --disable-libstdcxx-pch                 \
-        --enable-extra-sgxxlite-multilibs       \
-        --with-arch=armv7-a                     \
+        --enable-extra-sgxx-multilibs           \
+        --with-arch=armv6                       \
         --with-gnu-ld                           \
         --with-gnu-as                           \
         --enable-languages=c

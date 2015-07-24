@@ -3,12 +3,12 @@
 PWD=`pwd`
 TOOLSDIR=$PWD/../../tools
 SRCDIR=$PWD/../../source
-SYSDIR=$TOOLSDIR/crosstools/arm-none-linux-gnueabi/libc
+SYSDIR=$TOOLSDIR/crosstools/arm-none-linux-gnueabi/libc/armv4t
 
 TARGET=arm-none-linux-gnueabi
 
-CC="$TARGET-gcc -march=armv4t"                 \
-CXX="$TARGET-g++ -march=armv4t"                \
+CC="$TARGET-gcc -march=armv4t"                  \
+CXX="$TARGET-g++ -march=armv4t"                 \
 CFLAGS="-g -O2"                                 \
 AR=$TARGET-ar                                   \
 NM=$TARGET-nm                                   \
@@ -17,7 +17,7 @@ READELF=$TARGET-readelf                         \
 $SRCDIR/glibc-2.21/configure                    \
        --host=$TARGET                           \
        --prefix=/usr                            \
-       --with-headers=$SYSDIR/usr/include       \
+       --with-headers=$SYSDIR/../usr/include    \
        --disable-profile                        \
        --enable-add-ons                         \
        --enable-kernel=2.6.32                   \
@@ -26,9 +26,9 @@ $SRCDIR/glibc-2.21/configure                    \
        libc_cv_ctros_header=yes                 \
        libc_cv_c_cleanup=yes
 
-make install_root=$SYSDIR/armv4t install-bootstrap-headers=yes install-headers
+make install_root=$SYSDIR install-bootstrap-headers=yes install-headers
 make csu/subdir_lib
-mkdir $SYSDIR/armv4t/usr/lib -p
-cp csu/crt1.o csu/crti.o csu/crtn.o $SYSDIR/armv4t/usr/lib/
-$TARGET-gcc -march=armv4t -o $SYSDIR/armv4t/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
+mkdir $SYSDIR/usr/lib -p
+cp csu/crt1.o csu/crti.o csu/crtn.o $SYSDIR/usr/lib/
+$TARGET-gcc -march=armv4t -o $SYSDIR/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
 
