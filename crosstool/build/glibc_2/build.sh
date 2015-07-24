@@ -3,12 +3,12 @@
 PWD=`pwd`
 TOOLSDIR=$PWD/../../tools
 SRCDIR=$PWD/../../source
-SYSDIR=$TOOLSDIR/crosstools/arm-none-linux-gnueabi/libc/armv5te
+SYSDIR=$TOOLSDIR/crosstools/arm-none-linux-gnueabi/libc/armv7-a
 
 TARGET=arm-none-linux-gnueabi
 
-CC="$TARGET-gcc -march=armv5te"                 \
-CXX="$TARGET-g++ -march=armv5te"                \
+CC="$TARGET-gcc -march=armv7-a -mthumb"         \
+CXX="$TARGET-g++ -march=armv7-a -mthumb"        \
 CFLAGS="-g -O2"                                 \
 AR=$TARGET-ar                                   \
 NM=$TARGET-nm                                   \

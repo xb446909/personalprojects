@@ -4,6 +4,7 @@ PWD=`pwd`
 TOOLSDIR=$PWD/../../tools
 SRCDIR=$PWD/../../source
 SYSDIR=$TOOLSDIR/crosstools/arm-none-linux-gnueabi/libc/armv7-a
+mkdir -p $SYSDIR
 
 TARGET=arm-none-linux-gnueabi
 
