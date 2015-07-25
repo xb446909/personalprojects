@@ -1058,6 +1058,8 @@ arm*-*-linux-*)			# ARM GNU/Linux with ELF
 	    if test x$enable_extra_sgxx_multilibs = xyes; then
 		tm_file="${tm_file} arm/cs-linux.h"
 		tmake_file="${tmake_file} arm/t-cs-linux"
+        elif test x$enable_extra_sgxxlite_multilibs = xyes; then
+		tmake_file="${tmake_file} arm/t-cs-linux-lite"
 	    fi
 	    tm_file="$tm_file ./sysroot-suffix.h"
 	    tmake_file="$tmake_file t-sysroot-suffix"

@@ -5,28 +5,28 @@ TOOLSDIR=$PWD/../../tools
 SRCDIR=$PWD/../../source
 SYSDIR=$TOOLSDIR/crosstools/arm-none-linux-gnueabi/libc
 
-TARGET=arm-none-linux-gnueabi
-
-CC="$TARGET-gcc "                               \
-CXX="$TARGET-g++ "                              \
-CFLAGS="-g -O2"                                 \
-AR=$TARGET-ar                                   \
-NM=$TARGET-nm                                   \
-RANLIB=$TARGET-ranlib                           \
-READELF=$TARGET-readelf                         \
-$SRCDIR/glibc-2.21/configure                    \
-       --host=$TARGET                           \
-       --prefix=/usr                            \
-       --with-headers=$SYSDIR/usr/include       \
-       --disable-profile                        \
-       --enable-add-ons                         \
-       --enable-kernel=2.6.32                   \
-       --enable-obsolete-rpc                    \
-       libc_cv_forced_unwind=yes                \
-       libc_cv_ctros_header=yes                 \
-       libc_cv_c_cleanup=yes
-
-PARALLELMFLAGS=-j8 make
+#TARGET=arm-none-linux-gnueabi
+#
+#CC="$TARGET-gcc "                               \
+#CXX="$TARGET-g++ "                              \
+#CFLAGS="-g -O2"                                 \
+#AR=$TARGET-ar                                   \
+#NM=$TARGET-nm                                   \
+#RANLIB=$TARGET-ranlib                           \
+#READELF=$TARGET-readelf                         \
+#$SRCDIR/glibc-2.21/configure                    \
+#       --host=$TARGET                           \
+#       --prefix=/usr                            \
+#       --with-headers=$SYSDIR/usr/include       \
+#       --disable-profile                        \
+#       --enable-add-ons                         \
+#       --enable-kernel=2.6.32                   \
+#       --enable-obsolete-rpc                    \
+#       libc_cv_forced_unwind=yes                \
+#       libc_cv_ctros_header=yes                 \
+#       libc_cv_c_cleanup=yes
+#
+#PARALLELMFLAGS=-j8 make
 make install_root=$SYSDIR install
 mkdir $SYSDIR/usr/lib/bin -p
 mv $SYSDIR/sbin/ldconfig $SYSDIR/usr/lib/bin
