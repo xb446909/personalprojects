@@ -6,9 +6,10 @@ SRCDIR=$PWD/../../source
 SYSDIR=$TOOLSDIR/ToolChain/arm-none-linux-gnueabi/libc/armv4t
 
 TARGET=arm-none-linux-gnueabi
+FLAGS="-march=armv4t"
 
-CC="$TARGET-gcc -march=armv4t"                  \
-CXX="$TARGET-g++ -march=armv4t"                 \
+CC="$TARGET-gcc $FLAGS"                         \
+CXX="$TARGET-g++ $FLAGS"                        \
 CFLAGS="-g -O2"                                 \
 AR=$TARGET-ar                                   \
 NM=$TARGET-nm                                   \
@@ -17,7 +18,7 @@ READELF=$TARGET-readelf                         \
 $SRCDIR/glibc-2.21/configure                    \
        --host=$TARGET                           \
        --prefix=/usr                            \
-       --with-headers=$SYSDIR/../usr/include    \
+       --with-headers=$SYSDIR/usr/include       \
        --disable-profile                        \
        --enable-add-ons                         \
        --enable-kernel=2.6.32                   \

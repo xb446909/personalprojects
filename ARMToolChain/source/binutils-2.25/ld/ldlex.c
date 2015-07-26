@@ -1,5 +1,5 @@
 
-#line 3 "/cygdrive/f/Personal/GitHub/personalprojects/crosstool/build/binutils/../../source/binutils-2.25/ld/ldlex.c"
+#line 3 "/cygdrive/f/Personal/GitHub/personalprojects/ARMToolChain/build/binutils/../../source/binutils-2.25/ld/ldlex.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -1784,7 +1784,7 @@ int yywrap (void) { return 1; }
 
 
 
-#line 1788 "/cygdrive/f/Personal/GitHub/personalprojects/crosstool/build/binutils/../../source/binutils-2.25/ld/ldlex.c"
+#line 1788 "/cygdrive/f/Personal/GitHub/personalprojects/ARMToolChain/build/binutils/../../source/binutils-2.25/ld/ldlex.c"
 
 #define INITIAL 0
 #define SCRIPT 1
@@ -2019,7 +2019,7 @@ YY_DECL
 	}
     }
 
-#line 2023 "/cygdrive/f/Personal/GitHub/personalprojects/crosstool/build/binutils/../../source/binutils-2.25/ld/ldlex.c"
+#line 2023 "/cygdrive/f/Personal/GitHub/personalprojects/ARMToolChain/build/binutils/../../source/binutils-2.25/ld/ldlex.c"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -3200,7 +3200,7 @@ YY_RULE_SETUP
 #line 475 "ldlex.l"
 ECHO;
 	YY_BREAK
-#line 3204 "/cygdrive/f/Personal/GitHub/personalprojects/crosstool/build/binutils/../../source/binutils-2.25/ld/ldlex.c"
+#line 3204 "/cygdrive/f/Personal/GitHub/personalprojects/ARMToolChain/build/binutils/../../source/binutils-2.25/ld/ldlex.c"
 
 	case YY_END_OF_BUFFER:
 		{

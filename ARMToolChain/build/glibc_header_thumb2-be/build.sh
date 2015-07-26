@@ -4,12 +4,12 @@ PWD=`pwd`
 TOOLSDIR=$PWD/../../tools
 SRCDIR=$PWD/../../source
 SYSDIR=$TOOLSDIR/ToolChain/arm-none-linux-gnueabi/libc/thumb2-be
-mkdir -p $SYSDIR
 
 TARGET=arm-none-linux-gnueabi
+FLAGS="-mthumb -march=armv7-a -mbig-endian"
 
-CC="$TARGET-gcc -mthumb -march=armv7-a -mbig-endian"    \
-CXX="$TARGET-g++ -mthumb -march=armv7-a -mbig-endian"   \
+CC="$TARGET-gcc $FLAGS"                         \
+CXX="$TARGET-g++ $FLAGS"                        \
 CFLAGS="-g -O2"                                 \
 AR=$TARGET-ar                                   \
 NM=$TARGET-nm                                   \
@@ -27,9 +27,9 @@ $SRCDIR/glibc-2.21/configure                    \
        libc_cv_ctros_header=yes                 \
        libc_cv_c_cleanup=yes
 
-make install_root=$SYSDIR install-bootstrap-headers=yes install-headers
+make install_root=$SYSDIR/../ install-bootstrap-headers=yes install-headers
 make csu/subdir_lib
 mkdir $SYSDIR/usr/lib -p
 cp csu/crt1.o csu/crti.o csu/crtn.o $SYSDIR/usr/lib/
-$TARGET-gcc -march=armv4t -o $SYSDIR/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
+$TARGET-gcc $FLAGS -o $SYSDIR/usr/lib/libc.so -nostdlib -nostartfiles -shared -x c /dev/null
 

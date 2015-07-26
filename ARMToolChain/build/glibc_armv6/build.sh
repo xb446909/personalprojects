@@ -17,7 +17,7 @@ READELF=$TARGET-readelf                         \
 $SRCDIR/glibc-2.21/configure                    \
        --host=$TARGET                           \
        --prefix=/usr                            \
-       --with-headers=$SYSDIR/./usr/include    \
+       --with-headers=$SYSDIR/usr/include       \
        --disable-profile                        \
        --enable-add-ons                         \
        --enable-kernel=2.6.32                   \
