@@ -151,3 +151,10 @@ void CSocketDebugDlg::OnTcnSelchangeTabBase(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	*pResult = 0;
 }
+
+
+void CSocketDebugDlg::OnOK()
+{
+	// TODO: Add your specialized code here and/or call the base class
+	//CDialogEx::OnOK();
+}

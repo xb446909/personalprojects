@@ -10,6 +10,13 @@
 
 #include "resource.h"		// 主符号
 
+enum ConnectSt
+{
+	ST_INIT,
+	ST_LISTENING,
+	ST_ACCEPTED,
+	ST_CONNECTED
+};
 
 // CSocketDebugApp: 
 // 有关此类的实现，请参阅 SocketDebug.cpp

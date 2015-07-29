@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -11,7 +12,8 @@
 
 extern char ip_addr[16];
 extern int port;
-
+int sockfd;
+char recv_buf[1024] = {0};
 
 void    process_all(void);
 int     connect_server(void);
@@ -30,6 +32,9 @@ void process_all(void)
                 connect_state = ST_CONNECT;
             break;
         case ST_CONNECT:
+            recv(sockfd, recv_buf, 512, 0);
+            printf("recv: %s\n", recv_buf);
+            send(sockfd, "Hello!\r\n", strlen("Hello!\r\n") + 1, 0);
             break;
         }/*switch(connect_state)*/
         sleep(5);
@@ -39,7 +44,7 @@ void process_all(void)
 
 int connect_server(void)
 {
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in addr_ser = {0};
     int err;
 

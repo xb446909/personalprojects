@@ -21,4 +21,10 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnBnClickedBtnTcpserBind();
+
+	bool bConnect;
+	
+	afx_msg void OnBnClickedBtnTcpserClr();
+	afx_msg void OnBnClickedBtnTcpserSend();
 };

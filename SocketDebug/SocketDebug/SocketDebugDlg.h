@@ -40,4 +40,5 @@ public:
 	CUdpServer m_udpserver;
 	CUdpClient m_udpclient;
 	afx_msg void OnTcnSelchangeTabBase(NMHDR *pNMHDR, LRESULT *pResult);
+	virtual void OnOK();
 };
