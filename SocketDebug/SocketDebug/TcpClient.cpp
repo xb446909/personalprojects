@@ -9,6 +9,7 @@
 
 static DWORD WINAPI TcpClientReceiveProc(LPVOID lpParameter);
 extern void EditBoxAppendText(HWND hEditBox, LPCTSTR text);
+extern int MultibyteToUnicode(LPCSTR strIn, LPWSTR strOut, int nLenOut);
 BOOL TCPClientInitSocket();
 
 SOCKET TcpClientConnectSocket = { 0 };
@@ -145,6 +146,7 @@ BOOL CTcpClient::OnInitDialog()
 DWORD WINAPI TcpClientReceiveProc(LPVOID lpParameter)
 {
 	char recv_buf[1024];
+	wchar_t wrecv_buf[1024] = { 0 };
 	HWND hwnd = (HWND)lpParameter;
 	HWND hEditReceive = GetDlgItem(hwnd, IDC_EDIT_TCPCLIENT_RECV);
 	CString str;
@@ -167,7 +169,7 @@ DWORD WINAPI TcpClientReceiveProc(LPVOID lpParameter)
 				Sleep(1000);
 				break;
 			}
-			SetDlgItemText(hwnd, IDC_EDIT_TCPCLIENT_STATE, L"已断开");
+			SetDlgItemText(hwnd, IDC_EDIT_TCPCLIENT_STATE, L"正在连接");
 			GetDlgItemTextA(hwnd, IDC_IP_TCPCLIENT, ip_addr, 20);
 			port = GetDlgItemInt(hwnd, IDC_EDIT_TCPCLIENT_PORT, FALSE, FALSE);
 			server_addr.sin_port = htons(port);
@@ -210,7 +212,9 @@ DWORD WINAPI TcpClientReceiveProc(LPVOID lpParameter)
 			}
 			else
 			{
-				EditBoxAppendText(hEditReceive, CA2W(recv_buf) + L"\r\n");
+				MultibyteToUnicode(recv_buf, wrecv_buf, 1024);
+				str.Format(L"%s\r\n", wrecv_buf);
+				EditBoxAppendText(hEditReceive, str);
 			}
 			break;
 		default:

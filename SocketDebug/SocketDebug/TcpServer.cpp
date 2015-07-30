@@ -8,6 +8,7 @@
 
 static DWORD WINAPI ReceiveProc(LPVOID lpParameter);
 void EditBoxAppendText(HWND hEditBox, LPCTSTR text);
+int MultibyteToUnicode(LPCSTR strIn, LPWSTR strOut, int nLenOut);
 // CTcpServer ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(CTcpServer, CDialogEx)
@@ -137,6 +138,7 @@ void CTcpServer::OnBnClickedBtnTcpserBind()
 DWORD WINAPI ReceiveProc(LPVOID lpParameter)
 {
 	char recv_buf[1024];
+	wchar_t wrecv_buf[1024] = { 0 };
 	HWND hwnd = (HWND)lpParameter;
 	HWND hEditReceive = GetDlgItem(hwnd, IDC_EDIT_TCPSER_RECV);
 	CString str;
@@ -212,7 +214,9 @@ DWORD WINAPI ReceiveProc(LPVOID lpParameter)
 			}
 			else
 			{
-				EditBoxAppendText(hEditReceive, CA2W(recv_buf) + L"\r\n");
+				MultibyteToUnicode(recv_buf, wrecv_buf, 1024);
+				str.Format(L"%s\r\n", wrecv_buf);
+				EditBoxAppendText(hEditReceive, str);
 			}
 			break;
 		default:
@@ -244,4 +248,23 @@ void CTcpServer::OnBnClickedBtnTcpserSend()
 		return;
 	}
 	SetDlgItemText(IDC_EDIT_TCPSER_SEND, L"");
+}
+
+int MultibyteToUnicode(LPCSTR strIn, LPWSTR strOut, int nLenOut)
+{
+	if (strOut == NULL)
+	{
+		return 0;
+	}
+
+	int nLen = MultiByteToWideChar(CP_ACP, 0, strIn, -1, NULL, 0);
+	nLen = min(nLen, nLenOut);
+	MultiByteToWideChar(CP_ACP, 0, strIn, -1, strOut, nLen);
+
+	if (nLen < nLenOut)
+	{
+		strOut[nLen] = 0;
+	}
+
+	return nLen;
 }
