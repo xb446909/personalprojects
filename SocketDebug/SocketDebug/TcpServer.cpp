@@ -191,7 +191,7 @@ DWORD WINAPI ReceiveProc(LPVOID lpParameter)
 				iResult = WSAGetLastError();
 				if (iResult == WSAECONNRESET)
 				{
-					str.Format(L":%d 客户器已断开\r\n", client_addr.sin_port);
+					str.Format(L":%d 客户端已断开\r\n", client_addr.sin_port);
 					str = CA2W(inet_ntoa(client_addr.sin_addr)) + str;
 				}
 				else

