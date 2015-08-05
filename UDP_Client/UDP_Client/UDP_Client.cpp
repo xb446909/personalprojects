@@ -9,8 +9,8 @@
 // Link with ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
 
-#define		REMOTE_PORT		37872
-#define		REMOTE_NAME		"udptest.nat123.net"
+#define		REMOTE_PORT		11109
+#define		REMOTE_NAME		"www.sinlody.com"
 
 int main()
 {
@@ -26,6 +26,7 @@ int main()
 	unsigned short Port = REMOTE_PORT;
 
 	char SendBuf[1024];
+	char RecvBuf[1024];
 
 	sprintf(SendBuf, "HelloWorld");
 
@@ -76,6 +77,8 @@ int main()
 	RecvAddr.sin_port = htons(Port);
 	RecvAddr.sin_addr.s_addr = *(u_long *)remoteHost->h_addr_list[0];
 
+	int recv_len = sizeof(RecvAddr);
+
 	//---------------------------------------------
 	// Send a datagram to the receiver
 	wprintf(L"Sending a datagram to the receiver...\n");
@@ -87,6 +90,18 @@ int main()
 		WSACleanup();
 		return 1;
 	}
+
+	//-----------------------------------------------
+	// Call the recvfrom function to receive datagrams
+	// on the bound socket.
+	wprintf(L"Receiving datagrams...\n");
+	iResult = recvfrom(SendSocket,
+		RecvBuf, BufLen, 0, (SOCKADDR *)& RecvAddr, &recv_len);
+	if (iResult == SOCKET_ERROR) {
+		wprintf(L"recvfrom failed with error %d\n", WSAGetLastError());
+	}
+	printf_s("Recv: %s\n", RecvBuf);
+
 	//---------------------------------------------
 	// When the application is finished sending, close the socket.
 	wprintf(L"Finished sending. Closing socket.\n");

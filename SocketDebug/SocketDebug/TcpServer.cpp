@@ -139,6 +139,7 @@ DWORD WINAPI ReceiveProc(LPVOID lpParameter)
 {
 	char recv_buf[1024];
 	wchar_t wrecv_buf[1024] = { 0 };
+	char ip_strbuf[16] = { 0 };
 	HWND hwnd = (HWND)lpParameter;
 	HWND hEditReceive = GetDlgItem(hwnd, IDC_EDIT_TCPSER_RECV);
 	CString str;

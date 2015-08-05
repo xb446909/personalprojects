@@ -20,14 +20,14 @@ int child_pid;
 void    process_all(void);
 void    process_command(char* cmd);
 int     connect_server(void);
-int     create_process(const char* file,const char* argv);
+int     create_process(const char* file, const char* argv);
 
 
 void process_all(void)
 {
     connect_state = ST_DISCONNECT;
+    child_pid = create_process("/home/xiong/test", "/home/xiong/test -b /home/pi/20110729005.mp4");
 
-    child_pid = create_process("/home/xiong/test", "/home/xiong/test 111 222 333 444");
     while(1)
     {
         switch(connect_state)
@@ -64,9 +64,8 @@ void process_command(char* cmd)
         break;
     case 'A':
         send(sockfd, "Received A", strlen("Received A") + 1, 0);
-        sprintf(file_cwd, "%s/test.exe", file_cwd);
-        //child_pid = create_process(file_cwd, "test.exe");
-        child_pid = create_process("/home/xiong/test", "/home/xiong/test 111 222 333 444");
+        //sprintf(file_cwd, "%s/test.exe", file_cwd);
+        child_pid = create_process("/usr/bin/omxplayer", "/usr/bin/omxplayer -b /home/pi/20110729005.mp4");
         break;
     case 'b':
         send(sockfd, "Received b", strlen("Received b") + 1, 0);
@@ -82,30 +81,19 @@ void process_command(char* cmd)
 }
 
 
-int   create_process(const char* file,const char* argv)
+int   create_process(const char* file, const char* argv)
 {
     int child;
-    char* stragrv[128] = { 0 };
+    char* strargv[128] = { 0 };
     int i = 0;
-
-    char* tempargv = malloc(strlen(argv) + 1);
+    char* tempargv = (char*)malloc(strlen(argv) + 1);
     strcpy(tempargv, argv);
-    
-    //char tempargv[] = "aa bb cc dd";
 
-    char* temp = strtok(tempargv, " ");
-//    while(temp != NULL)
-//    {
-//        i++;
-//        temp = strtok(argv, " ");
-//    }
-    printf("i = %d, temp = %s, reset = %s\n", i, temp, tempargv);
-
-/*    strargv[i] = strtok(argv, " ");
+    strargv[i] = strtok(tempargv, " ");
     while(strargv[i] != NULL)
     {
         i++;
-        strargv[i] = strtok(argv, " ");
+        strargv[i] = strtok(NULL, " ");
     }
 
     if((child = fork()) == -1)
@@ -117,15 +105,14 @@ int   create_process(const char* file,const char* argv)
     {
         if(execv(file, strargv) == -1)
         {
-            perror("execl error");
+            perror("execv error");
             exit(EXIT_FAILURE);
         }
     }
     else
     {
         return child;
-    }*/
-    return 0;
+    }
 }
 
 
