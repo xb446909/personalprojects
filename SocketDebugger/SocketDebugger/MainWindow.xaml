@@ -1,0 +1,79 @@
+﻿<Window x:Class="SocketDebugger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SocketDebugger"
+        mc:Ignorable="d"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        Title="MainWindow" Height="350" Width="550" WindowStartupLocation="CenterScreen" BorderThickness="5" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True">
+    <Window.Effect>
+        <DropShadowEffect ShadowDepth="2" Opacity="0.75" Direction="270" BlurRadius="6"/>
+    </Window.Effect>
+    <Grid>
+        <Canvas Name="CloseBtn" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" MouseLeftButtonUp="OnCloseWindow" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
+            <Path Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z" Fill="Black" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center" HorizontalAlignment="Center" >
+                <Path.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="0.6" ScaleY="0.6"/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Path.RenderTransform>
+            </Path>
+        </Canvas>
+        <Canvas Name="Maximize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Maximize_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0">
+            <Path Data="M4,4H20V20H4V4M6,8V18H18V8H6Z" Fill="Black" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Path.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="0.6" ScaleY="0.6"/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Path.RenderTransform>
+            </Path>
+        </Canvas>
+        <Canvas Name="Minimize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Minimize_MouseLeftButtonUp" Height="24" Width="24" Margin="0,0,60,0" VerticalAlignment="Top" HorizontalAlignment="Right">
+            <Path Data="M20,14H4V10H20" Fill="Black" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" >
+                <Path.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="0.6" ScaleY="0.6"/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Path.RenderTransform>
+            </Path>
+        </Canvas>
+        <Canvas Name="Restore" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Restore_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0">
+            <Path Data="M4,8H8V4H20V16H16V20H4V8M16,8V14H18V6H10V8H16M6,12V18H14V12H6Z" Fill="Black" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" >
+                <Path.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="0.6" ScaleY="0.6"/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Path.RenderTransform>
+            </Path>
+        </Canvas>
+        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="348" Width="548" VerticalAlignment="Top" BorderThickness="1" Margin="3,5">
+            <TabItem x:Name="TCPServer" Header="TCP Server">
+                <Grid>
+                    <Label x:Name="label" Content="连接状态：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,14"/>
+                    <TextBox x:Name="textBox" Height="23" Margin="79,2,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" HorizontalAlignment="Left" Width="204"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="TCPClient" Header="TCP Client">
+            </TabItem>
+            <TabItem x:Name="UDPServer" Header="UDP Server">
+            </TabItem>
+            <TabItem x:Name="UDPClient" Header="UDP Client">
+            </TabItem>
+            <TabItem Header="Hidden" Height="30" Visibility="Hidden">
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
