@@ -11,7 +11,7 @@
         <DropShadowEffect ShadowDepth="2" Opacity="0.75" Direction="270" BlurRadius="6"/>
     </Window.Effect>
     <Grid>
-        <Canvas Name="CloseBtn" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" MouseLeftButtonUp="OnCloseWindow" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
+        <Canvas x:Name="CloseBtn" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" MouseLeftButtonUp="OnCloseWindow" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
             <Path Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z" Fill="Black" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center" HorizontalAlignment="Center" >
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -23,7 +23,7 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-        <Canvas Name="Maximize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Maximize_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0">
+        <Canvas x:Name="Maximize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Maximize_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0">
             <Path Data="M4,4H20V20H4V4M6,8V18H18V8H6Z" Fill="Black" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center" >
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -35,7 +35,7 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-        <Canvas Name="Minimize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Minimize_MouseLeftButtonUp" Height="24" Width="24" Margin="0,0,60,0" VerticalAlignment="Top" HorizontalAlignment="Right">
+        <Canvas x:Name="Minimize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Minimize_MouseLeftButtonUp" Height="24" Width="24" Margin="0,0,60,0" VerticalAlignment="Top" HorizontalAlignment="Right">
             <Path Data="M20,14H4V10H20" Fill="Black" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" >
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -47,7 +47,7 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-        <Canvas Name="Restore" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Restore_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0">
+        <Canvas x:Name="Restore" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Restore_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0">
             <Path Data="M4,8H8V4H20V16H16V20H4V8M16,8V14H18V6H10V8H16M6,12V18H14V12H6Z" Fill="Black" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" >
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -59,7 +59,7 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="348" Width="548" VerticalAlignment="Top" BorderThickness="1" Margin="3,5">
+        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="348" Width="548" VerticalAlignment="Top" BorderThickness="1" Margin="3,5" Panel.ZIndex="-1" Background="White">
             <TabItem x:Name="TCPServer" Header="TCP Server">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -71,21 +71,26 @@
                         <RowDefinition Height="30*"/>
                     </Grid.RowDefinitions>
                     <Label x:Name="label" Content="连接状态：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
-                    <TextBox x:Name="ConnectStatus" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="Waiting..." VerticalAlignment="Top"/>
-                    <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制"/>
+                    <TextBox x:Name="ConnectStatus" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="Closed" VerticalAlignment="Top"/>
+                    <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制">
+                        <Button x:Name="BindPort" Content="绑定端口" Margin="30,65,30,0" VerticalAlignment="Top" Click="BindPort_Click"/>
+                    </GroupBox>
+                    <Button x:Name="CleanRecvBox" Grid.Column="1" Content="清空接收框" Margin="41,135,46,0" VerticalAlignment="Top" Click="CleanRecvBox_Click"/>
+                    <Button x:Name="SendMessages" Grid.Column="1" Grid.Row="1" Content="发送消息" Margin="41,0,46,40" VerticalAlignment="Bottom" Click="SendMessages_Click"/>
+                    <Label Grid.Column="1" Content="端口号：" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="15,40,0,0" />
+                    <TextBox x:Name="Port" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Stretch" Height="24" VerticalAlignment="Top" Margin="20,65,30,0" >
+                    </TextBox>
                     <GroupBox Grid.Column="0" VerticalAlignment="Stretch" Header="接收" Margin="0,20,5,0"/>
+                    <TextBox x:Name="ReceiveControl" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,40,15,10" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
                     <GroupBox Grid.Column="0" Grid.Row="1" Margin="0,5,5,15"  Header="发送"/>
-                    <Ellipse Height="24" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Fill="#FF0808FB"/>
+                    <TextBox x:Name="SendControl" Grid.Row="1" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,25,15,25" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+                    <Ellipse Height="24" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Fill="#FFFF0000"/>
                 </Grid>
             </TabItem>
-            <TabItem x:Name="TCPClient" Header="TCP Client">
-            </TabItem>
-            <TabItem x:Name="UDPServer" Header="UDP Server">
-            </TabItem>
-            <TabItem x:Name="UDPClient" Header="UDP Client">
-            </TabItem>
-            <TabItem Header="Hidden" Height="30" Visibility="Hidden">
-            </TabItem>
+            <TabItem x:Name="TCPClient" Header="TCP Client"/>
+            <TabItem x:Name="UDPServer" Header="UDP Server"/>
+            <TabItem x:Name="UDPClient" Header="UDP Client"/>
+            <TabItem Header="Hidden" Height="30" Visibility="Hidden"/>
         </TabControl>
     </Grid>
 </Window>

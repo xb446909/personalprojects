@@ -117,12 +117,29 @@ namespace SocketDebugger
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.OriginalSource is Border || e.OriginalSource is Window)
+            if (e.OriginalSource is Border || e.OriginalSource is System.Windows.Controls.Primitives.TabPanel)
             {
                 WindowInteropHelper wih = new WindowInteropHelper(this);
                 SendMessage(wih.Handle, 0x00A1, 2, 0);
                 return;
             }
+        }
+
+        private void BindPort_Click(object sender, RoutedEventArgs e)
+        {
+            Grid grid = Content as Grid;
+            TextBox port_box = grid.FindName("Port") as TextBox;
+            
+        }
+
+        private void CleanRecvBox_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SendMessages_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
