@@ -62,8 +62,20 @@
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="348" Width="548" VerticalAlignment="Top" BorderThickness="1" Margin="3,5">
             <TabItem x:Name="TCPServer" Header="TCP Server">
                 <Grid>
-                    <Label x:Name="label" Content="连接状态：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,14"/>
-                    <TextBox x:Name="textBox" Height="23" Margin="79,2,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" HorizontalAlignment="Left" Width="204"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*"/>
+                        <ColumnDefinition Width="30*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="70*" />
+                        <RowDefinition Height="30*"/>
+                    </Grid.RowDefinitions>
+                    <Label x:Name="label" Content="连接状态：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
+                    <TextBox x:Name="ConnectStatus" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="Waiting..." VerticalAlignment="Top"/>
+                    <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制"/>
+                    <GroupBox Grid.Column="0" VerticalAlignment="Stretch" Header="接收" Margin="0,20,5,0"/>
+                    <GroupBox Grid.Column="0" Grid.Row="1" Margin="0,5,5,15"  Header="发送"/>
+                    <Ellipse Height="24" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Fill="#FF0808FB"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TCPClient" Header="TCP Client">
