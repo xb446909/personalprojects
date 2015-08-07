@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:SocketDebugger"
         mc:Ignorable="d"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        Closing="Window_Closing"
         Title="MainWindow" Height="350" Width="550" WindowStartupLocation="CenterScreen" BorderThickness="5" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True">
     <Window.Effect>
         <DropShadowEffect ShadowDepth="2" Opacity="0.75" Direction="270" BlurRadius="6"/>
@@ -73,10 +74,10 @@
                     <Label x:Name="label" Content="连接状态：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
                     <TextBox x:Name="ConnectStatus" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="Closed" VerticalAlignment="Top"/>
                     <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制">
-                        <Button x:Name="BindPort" Content="绑定端口" Margin="30,65,30,0" VerticalAlignment="Top" Click="BindPort_Click"/>
+                        <Button x:Name="TcpServerBindPort" Content="绑定端口" Margin="30,65,30,0" Height="20" VerticalAlignment="Top" Click="TcpServerBindPort_Click" Background="White" />
                     </GroupBox>
-                    <Button x:Name="CleanRecvBox" Grid.Column="1" Content="清空接收框" Margin="41,135,46,0" VerticalAlignment="Top" Click="CleanRecvBox_Click"/>
-                    <Button x:Name="SendMessages" Grid.Column="1" Grid.Row="1" Content="发送消息" Margin="41,0,46,40" VerticalAlignment="Bottom" Click="SendMessages_Click"/>
+                    <Button x:Name="TcpServerCleanRecvBox" Grid.Column="1" Content="清空接收框" Margin="41,135,46,0" VerticalAlignment="Top" Click="TcpServerCleanRecvBox_Click" Height="20" Background="White"/>
+                    <Button x:Name="TcpServerSendMessages" Grid.Column="1" Grid.Row="1" Content="发送消息" Margin="41,0,46,40" VerticalAlignment="Bottom" Click="TcpServerSendMessages_Click" Height="20" Background="White"/>
                     <Label Grid.Column="1" Content="端口号：" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="15,40,0,0" />
                     <TextBox x:Name="Port" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Stretch" Height="24" VerticalAlignment="Top" Margin="20,65,30,0" >
                     </TextBox>
@@ -84,7 +85,7 @@
                     <TextBox x:Name="ReceiveControl" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,40,15,10" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
                     <GroupBox Grid.Column="0" Grid.Row="1" Margin="0,5,5,15"  Header="发送"/>
                     <TextBox x:Name="SendControl" Grid.Row="1" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,25,15,25" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
-                    <Ellipse Height="24" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Fill="#FFFF0000"/>
+                    <Ellipse x:Name="StateLed" Height="24" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Fill="#FFC80000"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TCPClient" Header="TCP Client"/>

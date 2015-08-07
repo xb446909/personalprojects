@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SocketDebugger
 {
@@ -43,6 +37,8 @@ namespace SocketDebugger
         Brush brush_color3 = new SolidColorBrush(Color.FromRgb(168, 209, 118));
         Brush brush_color4 = new SolidColorBrush(Color.FromRgb(232, 68, 120));
 
+        TcpServerDebug m_TcpServer;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -61,6 +57,9 @@ namespace SocketDebugger
             tcp_client.Background = brush_color2;
             udp_server.Background = brush_color3;
             udp_client.Background = brush_color4;
+
+            m_TcpServer = new TcpServerDebug(MainGrid);
+
         }
 
         private void OnCloseWindow(object sender, MouseButtonEventArgs e)
@@ -125,21 +124,43 @@ namespace SocketDebugger
             }
         }
 
-        private void BindPort_Click(object sender, RoutedEventArgs e)
+        private void TcpServerBindPort_Click(object sender, RoutedEventArgs e)
         {
             Grid grid = Content as Grid;
             TextBox port_box = grid.FindName("Port") as TextBox;
-            
+
+            int port_num;
+            if (int.TryParse(port_box.Text, out port_num) == false)
+            {
+                MessageBox.Show("请输入正确的端口号");
+                return;
+            }
+
+            m_TcpServer.TcpServerBind(port_num);
         }
 
-        private void CleanRecvBox_Click(object sender, RoutedEventArgs e)
+        private void TcpServerCleanRecvBox_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show("Clean Clicked!");
         }
 
-        private void SendMessages_Click(object sender, RoutedEventArgs e)
+        private void TcpServerSendMessages_Click(object sender, RoutedEventArgs e)
         {
-
         }
+
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+        }
+    }
+
+    internal class StateObject
+    {
+        public const int BUFFER_SIZE = 1024;
+        public byte[] buffer = new byte[BUFFER_SIZE];
+        public Socket workSocket = null;
+        public StringBuilder sb = new StringBuilder();
+        public Thread thread;
+        public TcpListener listener;
     }
 }
