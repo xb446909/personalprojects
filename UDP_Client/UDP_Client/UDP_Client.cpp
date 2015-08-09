@@ -9,8 +9,10 @@
 // Link with ws2_32.lib
 #pragma comment(lib, "Ws2_32.lib")
 
-#define		REMOTE_PORT		11109
-#define		REMOTE_NAME		"www.sinlody.com"
+//#define		REMOTE_PORT		11109
+#define		REMOTE_PORT		10000
+//#define		REMOTE_NAME		"www.sinlody.com"
+#define		REMOTE_NAME		"localhost"
 
 int main()
 {
@@ -82,6 +84,7 @@ int main()
 	//---------------------------------------------
 	// Send a datagram to the receiver
 	wprintf(L"Sending a datagram to the receiver...\n");
+	BufLen = strlen(SendBuf);
 	iResult = sendto(SendSocket,
 		SendBuf, BufLen, 0, (SOCKADDR *) & RecvAddr, sizeof (RecvAddr));
 	if (iResult == SOCKET_ERROR) {

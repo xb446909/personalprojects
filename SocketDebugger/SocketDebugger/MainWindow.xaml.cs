@@ -38,6 +38,9 @@ namespace SocketDebugger
         Brush brush_color4 = new SolidColorBrush(Color.FromRgb(232, 68, 120));
 
         TcpServerDebug m_TcpServer;
+        TcpClientDebug m_TcpClient;
+        UdpServerDebug m_UdpServer;
+        UdpClientDebug m_UdpClient;
 
         public MainWindow()
         {
@@ -59,6 +62,9 @@ namespace SocketDebugger
             udp_client.Background = brush_color4;
 
             m_TcpServer = new TcpServerDebug(MainGrid);
+            m_TcpClient = new TcpClientDebug(MainGrid);
+            m_UdpServer = new UdpServerDebug(MainGrid);
+            m_UdpClient = new UdpClientDebug(MainGrid);
 
         }
 
@@ -128,6 +134,15 @@ namespace SocketDebugger
         {
             Grid grid = Content as Grid;
             TextBox port_box = grid.FindName("Port") as TextBox;
+            Button btn = sender as Button;
+
+            if(btn.Content.ToString() == "断开连接")
+            {
+                m_TcpServer.TcpServerStopConnect();
+                btn.Content = "监听端口";
+                return;
+            }
+
 
             int port_num;
             if (int.TryParse(port_box.Text, out port_num) == false)
@@ -136,21 +151,110 @@ namespace SocketDebugger
                 return;
             }
 
+            btn.Content = "断开连接";
             m_TcpServer.TcpServerBind(port_num);
         }
 
         private void TcpServerCleanRecvBox_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Clean Clicked!");
+            m_TcpServer.recv_box.Text = "";
         }
 
         private void TcpServerSendMessages_Click(object sender, RoutedEventArgs e)
         {
+            m_TcpServer.TcpServerSend(m_TcpServer.send_box.Text);
+            m_TcpServer.send_box.Text = "";
         }
 
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void TcpClientConnect_Click(object sender, RoutedEventArgs e)
         {
+            Grid grid = Content as Grid;
+            TextBox server_addr = grid.FindName("TcpServerAddr") as TextBox;
+            TextBox port_box = grid.FindName("TcpServerPort") as TextBox;
+            Button btn = (Button)sender;
+
+            if (btn.Content.ToString() == "断开")
+            {
+                m_TcpClient.TcpClientDisconnect();
+                btn.Content = "连接";
+                return;
+            }
+
+            int port_num;
+            if (int.TryParse(port_box.Text, out port_num) == false)
+            {
+                MessageBox.Show("请输入正确的端口号");
+                return;
+            }
+            btn.Content = "断开";
+            m_TcpClient.TcpClientConnect(server_addr.Text, port_num);
+        }
+
+        private void TcpClientCleanRecvBox_Click(object sender, RoutedEventArgs e)
+        {
+            m_TcpClient.recv_box.Text = "";
+        }
+
+        private void TcpClientSendMessages_Click(object sender, RoutedEventArgs e)
+        {
+            m_TcpClient.TcpClientSend(m_TcpClient.send_box.Text);
+            m_TcpClient.send_box.Text = "";
+        }
+
+        private void UdpServerBindPort_Click(object sender, RoutedEventArgs e)
+        {
+            Grid grid = Content as Grid;
+            TextBox port_box = grid.FindName("UdpServerPort") as TextBox;
+            Button btn = sender as Button;
+
+            if (btn.Content.ToString() == "断开连接")
+            {
+                btn.Content = "绑定端口";
+                m_UdpServer.UdpServerClose();
+                return;
+            }
+
+
+            int port_num;
+            if (int.TryParse(port_box.Text, out port_num) == false)
+            {
+                MessageBox.Show("请输入正确的端口号");
+                return;
+            }
+
+            btn.Content = "断开连接";
+            m_UdpServer.UdpServerBind(port_num);
+        }
+
+        private void UdpServerCleanRecvBox_Click(object sender, RoutedEventArgs e)
+        {
+            m_UdpServer.recv_box.Document.Blocks.Clear();
+        }
+
+        private void UdpServerSendMessages_Click(object sender, RoutedEventArgs e)
+        {
+            m_UdpServer.UdpServerSend(m_UdpServer.send_box.Text);
+            m_UdpServer.send_box.Text = "";
+        }
+
+        private void UdpClientCleanRecvBox_Click(object sender, RoutedEventArgs e)
+        {
+            m_UdpClient.recv_box.Text = "";
+        }
+
+        private void UdpClientSendMessages_Click(object sender, RoutedEventArgs e)
+        {
+            Grid grid = Content as Grid;
+            TextBox server_addr = grid.FindName("UdpClientIPAddress") as TextBox;
+            TextBox port_box = grid.FindName("UdpClientPort") as TextBox;
+            int port_num;
+            if (int.TryParse(port_box.Text, out port_num) == false)
+            {
+                m_UdpClient.recv_box.Text += "请输入正确的端口号\r\n";
+                return;
+            }
+            m_UdpClient.UdpClientSend(server_addr.Text, port_num, m_UdpClient.send_box.Text);
+            m_UdpClient.send_box.Text = "";
         }
     }
 
@@ -159,8 +263,9 @@ namespace SocketDebugger
         public const int BUFFER_SIZE = 1024;
         public byte[] buffer = new byte[BUFFER_SIZE];
         public Socket workSocket = null;
-        public StringBuilder sb = new StringBuilder();
         public Thread thread;
         public TcpListener listener;
+        public TcpClient client;
+        public IAsyncResult ar;
     }
 }

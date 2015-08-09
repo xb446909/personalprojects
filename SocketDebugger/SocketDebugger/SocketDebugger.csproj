@@ -58,7 +58,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="TcpClientDebug.cs" />
     <Compile Include="TcpServerDebug.cs" />
+    <Compile Include="UdpClientDebug.cs" />
+    <Compile Include="UdpServerDebug.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -6,13 +6,12 @@
         xmlns:local="clr-namespace:SocketDebugger"
         mc:Ignorable="d"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
-        Closing="Window_Closing"
         Title="MainWindow" Height="350" Width="550" WindowStartupLocation="CenterScreen" BorderThickness="5" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True">
     <Window.Effect>
         <DropShadowEffect ShadowDepth="2" Opacity="0.75" Direction="270" BlurRadius="6"/>
     </Window.Effect>
     <Grid>
-        <Canvas x:Name="CloseBtn" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" MouseLeftButtonUp="OnCloseWindow" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
+        <Canvas x:Name="CloseBtn" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" MouseLeftButtonUp="OnCloseWindow" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" Grid.Column="1">
             <Path Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z" Fill="Black" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center" HorizontalAlignment="Center" >
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -24,7 +23,7 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-        <Canvas x:Name="Maximize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Maximize_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0">
+        <Canvas x:Name="Maximize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Maximize_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0" Grid.Column="1">
             <Path Data="M4,4H20V20H4V4M6,8V18H18V8H6Z" Fill="Black" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center" >
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -36,7 +35,7 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-        <Canvas x:Name="Minimize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Minimize_MouseLeftButtonUp" Height="24" Width="24" Margin="0,0,60,0" VerticalAlignment="Top" HorizontalAlignment="Right">
+        <Canvas x:Name="Minimize" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Minimize_MouseLeftButtonUp" Height="24" Width="24" Margin="0,0,60,0" VerticalAlignment="Top" HorizontalAlignment="Right" Grid.Column="1">
             <Path Data="M20,14H4V10H20" Fill="Black" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" >
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -48,7 +47,7 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-        <Canvas x:Name="Restore" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Restore_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0">
+        <Canvas x:Name="Restore" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" MouseLeftButtonUp="Restore_MouseLeftButtonUp" Width="24" Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,30,0" Grid.Column="1">
             <Path Data="M4,8H8V4H20V16H16V20H4V8M16,8V14H18V6H10V8H16M6,12V18H14V12H6Z" Fill="Black" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" >
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -60,7 +59,7 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="348" Width="548" VerticalAlignment="Top" BorderThickness="1" Margin="3,5" Panel.ZIndex="-1" Background="White">
+        <TabControl x:Name="tabControl" BorderThickness="1" Margin="3,5,3,3" Panel.ZIndex="-1" Background="White" Grid.RowSpan="2" Grid.ColumnSpan="2" Width="525" Height="330">
             <TabItem x:Name="TCPServer" Header="TCP Server">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -71,10 +70,10 @@
                         <RowDefinition Height="70*" />
                         <RowDefinition Height="30*"/>
                     </Grid.RowDefinitions>
-                    <Label x:Name="label" Content="连接状态：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
+                    <Label Content="连接状态：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
                     <TextBox x:Name="ConnectStatus" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="Closed" VerticalAlignment="Top"/>
                     <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制">
-                        <Button x:Name="TcpServerBindPort" Content="绑定端口" Margin="30,65,30,0" Height="20" VerticalAlignment="Top" Click="TcpServerBindPort_Click" Background="White" />
+                        <Button x:Name="TcpServerBindPort" Content="监听端口" Margin="30,65,30,0" Height="20" VerticalAlignment="Top" Click="TcpServerBindPort_Click" Background="White" />
                     </GroupBox>
                     <Button x:Name="TcpServerCleanRecvBox" Grid.Column="1" Content="清空接收框" Margin="41,135,46,0" VerticalAlignment="Top" Click="TcpServerCleanRecvBox_Click" Height="20" Background="White"/>
                     <Button x:Name="TcpServerSendMessages" Grid.Column="1" Grid.Row="1" Content="发送消息" Margin="41,0,46,40" VerticalAlignment="Bottom" Click="TcpServerSendMessages_Click" Height="20" Background="White"/>
@@ -82,15 +81,85 @@
                     <TextBox x:Name="Port" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Stretch" Height="24" VerticalAlignment="Top" Margin="20,65,30,0" >
                     </TextBox>
                     <GroupBox Grid.Column="0" VerticalAlignment="Stretch" Header="接收" Margin="0,20,5,0"/>
-                    <TextBox x:Name="ReceiveControl" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,40,15,10" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+                    <TextBox x:Name="ReceiveControl" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,40,15,10" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto" IsTabStop="False"/>
                     <GroupBox Grid.Column="0" Grid.Row="1" Margin="0,5,5,15"  Header="发送"/>
-                    <TextBox x:Name="SendControl" Grid.Row="1" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,25,15,25" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+                    <TextBox x:Name="SendControl" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,25,15,25" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
                     <Ellipse x:Name="StateLed" Height="24" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Fill="#FFC80000"/>
                 </Grid>
             </TabItem>
-            <TabItem x:Name="TCPClient" Header="TCP Client"/>
-            <TabItem x:Name="UDPServer" Header="UDP Server"/>
-            <TabItem x:Name="UDPClient" Header="UDP Client"/>
+            <TabItem x:Name="TCPClient" Header="TCP Client">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="70*" />
+                        <RowDefinition Height="30*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+                    <Label x:Name="label2" Content="服务器地址:" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="75" Margin="1,0,0,0"/>
+                    <TextBox x:Name="TcpServerAddr" Height="24" Margin="75,2,30,0" TextWrapping="Wrap" Text="localhost" VerticalAlignment="Top"/>
+                    <Label Grid.ColumnSpan="2" Content="端口号：" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="340,0,0,0" />
+                    <TextBox x:Name="TcpServerPort" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Height="24" VerticalAlignment="Top" Margin="400,0,30,0" />
+                    <Ellipse x:Name="TcpClientStateLed" Grid.ColumnSpan="2" Height="24" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Fill="#FFC80000"/>
+                    <GroupBox Grid.Column="0" Grid.Row="1" Margin="0,5,5,15"  Header="发送"/>
+                    <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制" />
+                    <GroupBox Grid.Column="0" VerticalAlignment="Stretch" Header="接收" Margin="0,20,5,0"/>
+                    <TextBox x:Name="TcpClientReceiveControl" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,40,15,10" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+                    <TextBox x:Name="TcpClientSendControl" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,25,15,25" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+                    <Button x:Name="TcpClientConnect" Grid.Column="1" Content="连接" Margin="41,50,46,0" Height="20" VerticalAlignment="Top" Click="TcpClientConnect_Click" Background="White" />
+                    <Button x:Name="TcpClientCleanRecvBox" Grid.Column="1" Content="清空接收框" Margin="41,80,46,0" VerticalAlignment="Top" Click="TcpClientCleanRecvBox_Click" Height="20" Background="White"/>
+                    <Button x:Name="TcpClientSendMessages" Grid.Column="1" Grid.Row="1" Content="发送消息" Margin="41,0,46,40" VerticalAlignment="Bottom" Click="TcpClientSendMessages_Click" Height="20" Background="White"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="UDPServer" Header="UDP Server" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="70*" />
+                        <RowDefinition Height="30*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="远程地址：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
+                    <TextBox x:Name="UdpServerConnectStatus" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="Closed" VerticalAlignment="Top"/>
+                    <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制" />
+                    <GroupBox Grid.Column="0" VerticalAlignment="Stretch" Header="接收" Margin="0,20,5,0"/>
+                    <GroupBox Grid.Column="0" Grid.Row="1" Margin="0,5,5,15"  Header="发送"/>
+                    <RichTextBox x:Name="UdpServerReceiveControl" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,40,15,10" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto" IsTabStop="False"/>
+                    <TextBox x:Name="UdpServerSendControl" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,25,15,25" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+                    <Ellipse x:Name="UdpServerStateLed" Height="24" Margin="0,2,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Fill="#FFC80000"/>
+                    <Label Grid.Column="1" Content="端口号：" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="15,40,0,0" />
+                    <TextBox x:Name="UdpServerPort" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Stretch" Height="24" VerticalAlignment="Top" Margin="20,65,30,0" />
+                    <Button x:Name="UdpServerBindPort" Grid.Column="1" Content="绑定端口" Margin="41,100,46,0" Height="20" VerticalAlignment="Top" Click="UdpServerBindPort_Click" Background="White" />
+                    <Button x:Name="UdpServerCleanRecvBox" Grid.Column="1" Content="清空接收框" Margin="41,135,46,0" VerticalAlignment="Top" Click="UdpServerCleanRecvBox_Click" Height="20" Background="White"/>
+                    <Button x:Name="UdpServerSendMessages" Grid.Column="1" Grid.Row="1" Content="发送消息" Margin="41,0,46,40" VerticalAlignment="Bottom" Click="UdpServerSendMessages_Click" Height="20" Background="White"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="UDPClient" Header="UDP Client" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="70*" />
+                        <RowDefinition Height="30*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="远程地址：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
+                    <TextBox x:Name="UdpClientIPAddress" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="Closed" VerticalAlignment="Top"/>
+                    <Label Content="远程端口：" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
+                    <TextBox x:Name="UdpClientPort" Grid.Column="1" Height="24" Width="80" HorizontalAlignment="Right" Margin="0,2,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制" />
+                    <GroupBox Grid.Column="0" VerticalAlignment="Stretch" Header="接收" Margin="0,20,5,0"/>
+                    <GroupBox Grid.Column="0" Grid.Row="1" Margin="0,5,5,15"  Header="发送"/>
+                    <TextBox x:Name="UdpClientReceiveControl" IsReadOnly="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,40,15,10" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto" IsTabStop="False"/>
+                    <TextBox x:Name="UdpClientSendControl" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,25,15,25" TextWrapping="Wrap" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
+                    <Button x:Name="UdpClientCleanRecvBox" Grid.Column="1" Content="清空接收框" Margin="41,135,46,0" VerticalAlignment="Top" Click="UdpClientCleanRecvBox_Click" Height="20" Background="White"/>
+                    <Button x:Name="UdpClientSendMessages" Grid.Column="1" Grid.Row="1" Content="发送消息" Margin="41,0,46,40" VerticalAlignment="Bottom" Click="UdpClientSendMessages_Click" Height="20" Background="White"/>
+                </Grid>
+            </TabItem>
             <TabItem Header="Hidden" Height="30" Visibility="Hidden"/>
         </TabControl>
     </Grid>
