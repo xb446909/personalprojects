@@ -7,13 +7,6 @@
 #define MAX_FILEPATH    80
 
 
-enum
-{
-    ST_DISCONNECT,
-    ST_CONNECT
-}connect_state;
-
-
 void process_all(void);
 
 #endif

@@ -17,18 +17,29 @@ char recv_buf[CMD_BUF_LEN] = {0};
 char proc_buf[CMD_BUF_LEN] = {0};
 int child_pid;
 pthread_t keeponline_thread;
+struct sockaddr_in addr_ser = { 0 };
 
 void    process_all(void);
 void    process_command(char* cmd);
 int     connect_server(void);
 int     create_process(const char* file, const char* argv);
 void*   keeponline(void* arg);
+void    send_msg(char* msg);
+
+
+void send_msg(char* msg)
+{
+    sendto(sockfd, msg, strlen(msg), 0,
+            (struct sockaddr*)&addr_ser, sizeof(addr_ser));
+}
 
 
 void process_all(void)
 {
     int res;
-
+    struct sockaddr_in addr_ser = { 0 };
+    int len;
+    
     res = pthread_create(&keeponline_thread, NULL, keeponline, NULL);
     if(res != 0)
     {
@@ -38,33 +49,16 @@ void process_all(void)
 
     while(1)
     {
+        recvfrom(sockfd, recv_buf, CMD_BUF_LEN, 0, 
+                (struct sockaddr*)&addr_ser, &len);
+        process_command(recv_buf);
     }
-
-    connect_state = ST_DISCONNECT;
-
-
-    while(1)
-    {
-        switch(connect_state)
-        {
-        case ST_DISCONNECT:
-            if(connect_server() == 0)
-                connect_state = ST_CONNECT;
-            break;
-        case ST_CONNECT:
-            recv(sockfd, recv_buf, CMD_BUF_LEN, 0);
-            process_command(recv_buf);
-            break;
-        }/*switch(connect_state)*/
-        sleep(5);
-    }/*while(1)*/
 }
 
 void*   keeponline(void* arg)
 {
     char buf[512] = {0};
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    struct sockaddr_in addr_ser = {0};
     int err;
 
     debug("Connecting to %s:%d\n", ip_addr, port);
@@ -100,22 +94,22 @@ void process_command(char* cmd)
     switch(cmd[1])
     {
     case 'a':
-        send(sockfd, "Received a", strlen("Received a") + 1, 0);
+        send_msg("Receive a");
         system("rm log.txt -f");
         break;
     case 'A':
-        send(sockfd, "Received A", strlen("Received A") + 1, 0);
+        send_msg("Receive A");
         //sprintf(file_cwd, "%s/test.exe", file_cwd);
         child_pid = create_process("/usr/bin/omxplayer", "/usr/bin/omxplayer -b /home/pi/20110729005.mp4");
         break;
     case 'b':
-        send(sockfd, "Received b", strlen("Received b") + 1, 0);
+        send_msg("Receive b");
         sprintf(proc_buf, "kill %d", child_pid);
         printf("b: %s\n", proc_buf);
         system(proc_buf);
         break;
     default:
-        send(sockfd, "Unknown command", strlen("Unknown command") + 1, 0);
+        send_msg("Unknown command");
         debug("Unknown command (%s) received!\n", cmd);
         break;
     }
@@ -157,30 +151,3 @@ int   create_process(const char* file, const char* argv)
 }
 
 
-
-int connect_server(void)
-{
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in addr_ser = {0};
-    int err;
-
-    debug("Connecting to %s:%d\n", ip_addr, port);
-
-    if(sockfd == -1)
-    {
-        debug("Create socket error, %d\n", errno);
-        return -1;
-    }
-
-    addr_ser.sin_family = AF_INET;
-    addr_ser.sin_addr.s_addr = inet_addr(ip_addr);
-    addr_ser.sin_port = htons(port);
-    
-    err = connect(sockfd, (struct sockaddr*)&addr_ser, sizeof(addr_ser));
-    if(err == -1)
-    {
-        debug("Connect server error, %d\n", errno);
-        return errno;
-    }
-    return 0;
-}
