@@ -16,17 +16,32 @@ int sockfd;
 char recv_buf[CMD_BUF_LEN] = {0};
 char proc_buf[CMD_BUF_LEN] = {0};
 int child_pid;
+pthread_t keeponline_thread;
 
 void    process_all(void);
 void    process_command(char* cmd);
 int     connect_server(void);
 int     create_process(const char* file, const char* argv);
+void*   keeponline(void* arg);
 
 
 void process_all(void)
 {
+    int res;
+
+    res = pthread_create(&keeponline_thread, NULL, keeponline, NULL);
+    if(res != 0)
+    {
+        debug("Thread creation failed!");
+        exit(0);
+    }
+
+    while(1)
+    {
+    }
+
     connect_state = ST_DISCONNECT;
-    child_pid = create_process("/home/xiong/test", "/home/xiong/test -b /home/pi/20110729005.mp4");
+
 
     while(1)
     {
@@ -45,6 +60,32 @@ void process_all(void)
     }/*while(1)*/
 }
 
+void*   keeponline(void* arg)
+{
+    char buf[512] = {0};
+    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    struct sockaddr_in addr_ser = {0};
+    int err;
+
+    debug("Connecting to %s:%d\n", ip_addr, port);
+
+    if(sockfd == -1)
+    {
+        debug("Create socket error, %d\n", errno);
+        return;
+    }
+
+    addr_ser.sin_family = AF_INET;
+    addr_ser.sin_addr.s_addr = inet_addr(ip_addr);
+    addr_ser.sin_port = htons(port);
+
+    while(1)
+    {
+        sendto(sockfd, "Hello!", strlen("Hello!"), 0,
+                (struct sockaddr*)&addr_ser, sizeof(addr_ser));
+        sleep(1);
+    }
+}
 
 void process_command(char* cmd)
 {
