@@ -21,7 +21,7 @@ int main()
 	SOCKET RecvSocket;
 	sockaddr_in RecvAddr;
 
-	unsigned short Port = 12345;
+	unsigned short Port = 10000;
 
 	char RecvBuf[1024];
 	int BufLen = 1024;

@@ -148,7 +148,7 @@
                         <ColumnDefinition Width="30*" />
                     </Grid.ColumnDefinitions>
                     <Label Content="远程地址：" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
-                    <TextBox x:Name="UdpClientIPAddress" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="Closed" VerticalAlignment="Top"/>
+                    <TextBox x:Name="UdpClientIPAddress" Height="24" Margin="70,2,30,0" TextWrapping="Wrap" Text="localhost" VerticalAlignment="Top"/>
                     <Label Content="远程端口：" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Height="25" Width="64" Margin="1,0,0,0"/>
                     <TextBox x:Name="UdpClientPort" Grid.Column="1" Height="24" Width="80" HorizontalAlignment="Right" Margin="0,2,10,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
                     <GroupBox Grid.Column="1" Grid.RowSpan="2" Margin="5,20,10,15" Header="控制" />
