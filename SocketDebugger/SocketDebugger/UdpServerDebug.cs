@@ -15,7 +15,7 @@ namespace SocketDebugger
 {
     internal class UdpServerDebug
     {
-        private Paragraph p = new Paragraph();
+        public Paragraph p = new Paragraph();
         public TextBox connect_state;
         public RichTextBox recv_box;
         public TextBox send_box;

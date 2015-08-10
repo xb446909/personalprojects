@@ -228,7 +228,8 @@ namespace SocketDebugger
 
         private void UdpServerCleanRecvBox_Click(object sender, RoutedEventArgs e)
         {
-            m_UdpServer.recv_box.Document.Blocks.Clear();
+            //m_UdpServer.recv_box.Document.Blocks.Clear();
+            m_UdpServer.p.Inlines.Clear();
         }
 
         private void UdpServerSendMessages_Click(object sender, RoutedEventArgs e)
