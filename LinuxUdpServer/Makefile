@@ -1,6 +1,6 @@
 CC=gcc
-TARGET=webcontrol
-CFLAGS=-O2 -lpthread
+TARGET=udpserver
+CFLAGS=-g
 
 OBJ=main.o process.o
 

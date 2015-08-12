@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <errno.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -19,8 +19,6 @@ char recv_buf[CMD_BUF_LEN] = {0};
 char proc_buf[CMD_BUF_LEN] = {0};
 int child_pid;
 pthread_t keeponline_thread;
-pthread_t shortmessage_thread;
-pthread_t servermessage_thread;
 struct sockaddr_in addr_ser = { 0 };
 
 void    process_all(void);
@@ -28,28 +26,45 @@ void    process_command(char* cmd);
 int     connect_server(void);
 int     create_process(const char* file, const char* argv);
 void*   keeponline(void* arg);
-void*   recv_shortmessage(void* arg);
-void*   recv_servermessage(void* arg);
-void    send_msg(char* msg);
+void    send_msg(struct sockaddr_in remoteaddr, char* msg);
 int     opencom(char* dev);
 int     set_opt(int fd, int nSpeed, int nBits, char nEvent, int nStop);
 
 
-void send_msg(char* msg)
+void send_msg(struct sockaddr_in remoteaddr, char* msg)
 {
     sendto(sockfd, msg, strlen(msg), 0,
-            (struct sockaddr*)&addr_ser, sizeof(addr_ser));
+            (struct sockaddr*)&remoteaddr, sizeof(struct sockaddr));
 }
 
 
 void process_all(void)
 {
     int res;
+    struct sockaddr_in addr_ser = { 0 };
+    int len;
 
+    res = pthread_create(&keeponline_thread, NULL, keeponline, NULL);
+    if(res != 0)
+    {
+        debug("Thread creation failed!");
+        exit(0);
+    }
+
+    while(1)
+    {
+        //recvfrom(sockfd, recv_buf, CMD_BUF_LEN, 0, 
+          //      (struct sockaddr*)&addr_ser, &len);
+        //process_command(recv_buf);
+    }
+}
+
+void*   keeponline(void* arg)
+{
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    int err;
+    int read_len = 0;
     
-    debug("Connecting to %s:%d\n", ip_addr, port);
-
     if(sockfd == -1)
     {
         debug("Create socket error, %d\n", errno);
@@ -57,90 +72,32 @@ void process_all(void)
     }
 
     addr_ser.sin_family = AF_INET;
-    addr_ser.sin_addr.s_addr = inet_addr(ip_addr);
+    addr_ser.sin_addr.s_addr = htonl(INADDR_ANY);
     addr_ser.sin_port = htons(port);
 
-    sendto(sockfd, "Hello!", strlen("Hello!"), 0,
-        (struct sockaddr*)&addr_ser, sizeof(addr_ser));
-
-    res = pthread_create(&keeponline_thread, NULL, keeponline, NULL);
-    if(res != 0)
+    if(bind(sockfd, (struct sockaddr*)&addr_ser, sizeof(addr_ser)) < 0)
     {
-        debug("Keep Online thread creation failed!");
-        exit(0);
+        debug("Bind port error!\n");
+        perror("Bind port error!\n");
+    }
+    else
+    {
+        debug("Bind port %d successfully!\n", port);
     }
 
-    res = pthread_create(&shortmessage_thread, NULL, recv_shortmessage, NULL);
-    if(res != 0)
-    {
-        debug("Receive short message thread creation failed!");
-        exit(0);
-    }
-    
-    res = pthread_create(&servermessage_thread, NULL, recv_servermessage, NULL);
-    if(res != 0)
-    {
-        debug("Receive server thread creation failed!");
-        exit(0);
-    }
-    
-    while(1)
-    {
-    }
-
-
-}
-
-
-void*   recv_shortmessage(void* arg)
-{    
-    int fd = opencom("/dev/ttyS0");
-    
-    if(fd < 0)
-    {
-        perror("open error\n");
-        return;
-    }
-
-    int i = set_opt(fd, 115200, 8, 'N', 1);
-    if(i < 0)
-    {
-        perror("set opt error");
-        return;
-    }
+    struct sockaddr_in clientAddr;
+    int len = sizeof(clientAddr);
 
     while(1)
     {
-        memset(recv_buf, 0, CMD_BUF_LEN);
-        int n = read(fd, recv_buf, CMD_BUF_LEN);
-        if(n > 0)
-            printf("%s", recv_buf);
-    }
-
-}
-
-
-void*   recv_servermessage(void* arg)
-{
-    struct sockaddr_in addr_ser = { 0 };
-    int len = 0;
-
-    while(1)
-    {
-        recvfrom(sockfd, recv_buf, CMD_BUF_LEN, 0, 
-                (struct sockaddr*)&addr_ser, &len);
-        process_command(recv_buf);
-    }
-}
-
-
-void*   keeponline(void* arg)
-{
-    while(1)
-    {
-        sendto(sockfd, "Hello!", strlen("Hello!"), 0,
-                (struct sockaddr*)&addr_ser, sizeof(addr_ser));
-        sleep(20);
+        memset(recv_buf, '\0', CMD_BUF_LEN);
+        read_len = recvfrom(sockfd, recv_buf, CMD_BUF_LEN, 0, 
+                (struct sockaddr*)&clientAddr, &len);
+        printf("recvfrom %s:%d length: %d, recv: %s\n", 
+                inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port,
+                read_len, recv_buf);
+        sleep(1);
+        send_msg(clientAddr, "Received!\n");
     }
 }
 
@@ -157,23 +114,12 @@ void process_command(char* cmd)
     switch(cmd[1])
     {
     case 'a':
-        send_msg("Receive a");
-        system("rm log.txt -f");
         break;
     case 'A':
-        send_msg("Receive A");
-        //sprintf(file_cwd, "%s/test.exe", file_cwd);
-        child_pid = create_process("/usr/bin/omxplayer", "/usr/bin/omxplayer -b /home/pi/20110729005.mp4");
         break;
     case 'b':
-        send_msg("Receive b");
-        sprintf(proc_buf, "kill %d", child_pid);
-        printf("b: %s\n", proc_buf);
-        system(proc_buf);
         break;
     default:
-        send_msg("Unknown command");
-        debug("Unknown command (%s) received!\n", cmd);
         break;
     }
 }
