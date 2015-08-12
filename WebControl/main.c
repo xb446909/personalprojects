@@ -7,7 +7,7 @@
 
 #include "process.h"
 
-char ip_addr[16] = {0};
+char hostname[CMD_BUF_LEN] = {0};
 int port = 0;
 
 int main(int argc, char** argv)
@@ -16,20 +16,14 @@ int main(int argc, char** argv)
     
     opterr = 0;
     port = DEFAULT_PORT;
-    strcpy(ip_addr, DEFAULT_IP);
+    strcpy(hostname, DEFAULT_HOST);
 
     while((result = getopt(argc, argv, "i:p:h")) != -1)
     {
         switch(result)
         {
             case 'i':
-                if(strlen(optarg) > 15)
-                {
-                    fprintf(stderr, "Usage: %s [-i ip] [-p port]\n", argv[0]);
-                    exit(0);
-                }
-                else
-                    strcpy(ip_addr, optarg);
+                strcpy(hostname, optarg);
                 break;
             case 'p':
                 port = atoi(optarg);

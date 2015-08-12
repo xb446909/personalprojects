@@ -12,16 +12,17 @@
 #include "logger.h"
 #include "process.h"
 
-extern char ip_addr[16];
+extern char hostname[CMD_BUF_LEN];
 extern int port;
 int sockfd;
-char recv_buf[CMD_BUF_LEN] = {0};
-char proc_buf[CMD_BUF_LEN] = {0};
+char recv_buf[CMD_BUF_LEN] = { 0 };
+char proc_buf[CMD_BUF_LEN] = { 0 };
 int child_pid;
 pthread_t keeponline_thread;
 pthread_t shortmessage_thread;
 pthread_t servermessage_thread;
 struct sockaddr_in addr_ser = { 0 };
+struct hostent* phost;
 
 void    process_all(void);
 void    process_command(char* cmd);
@@ -46,41 +47,52 @@ void process_all(void)
 {
     int res;
 
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    
-    debug("Connecting to %s:%d\n", ip_addr, port);
+    phost = gethostbyname(hostname);
 
-    if(sockfd == -1)
+    if(phost == NULL)
     {
-        debug("Create socket error, %d\n", errno);
-        return;
+        perror("Get host error");
+        debug("Can't get host by %s\n", hostname);
     }
-
-    addr_ser.sin_family = AF_INET;
-    addr_ser.sin_addr.s_addr = inet_addr(ip_addr);
-    addr_ser.sin_port = htons(port);
-
-    sendto(sockfd, "Hello!", strlen("Hello!"), 0,
-        (struct sockaddr*)&addr_ser, sizeof(addr_ser));
-
-    res = pthread_create(&keeponline_thread, NULL, keeponline, NULL);
-    if(res != 0)
+    else
     {
-        debug("Keep Online thread creation failed!");
-        exit(0);
+
+        sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+        
+        debug("Connecting to %s:%d\n", hostname, port);
+
+        if(sockfd == -1)
+        {
+            debug("Create socket error, %d\n", errno);
+            return;
+        }
+
+        addr_ser.sin_family = AF_INET;
+        memcpy(&addr_ser.sin_addr.s_addr, phost->h_addr_list[0], phost->h_length);
+        addr_ser.sin_port = htons(port);
+
+        sendto(sockfd, "Hello!", strlen("Hello!"), 0,
+            (struct sockaddr*)&addr_ser, sizeof(addr_ser));
+
+        res = pthread_create(&keeponline_thread, NULL, keeponline, NULL);
+        if(res != 0)
+        {
+            debug("Keep Online thread creation failed!");
+            exit(0);
+        }
+
+        res = pthread_create(&servermessage_thread, NULL, recv_servermessage, NULL);
+        if(res != 0)
+        {
+            debug("Receive server thread creation failed!");
+            exit(0);
+        }
     }
 
     res = pthread_create(&shortmessage_thread, NULL, recv_shortmessage, NULL);
     if(res != 0)
     {
         debug("Receive short message thread creation failed!");
-        exit(0);
-    }
-    
-    res = pthread_create(&servermessage_thread, NULL, recv_servermessage, NULL);
-    if(res != 0)
-    {
-        debug("Receive server thread creation failed!");
         exit(0);
     }
     
