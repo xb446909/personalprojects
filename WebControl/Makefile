@@ -1,6 +1,6 @@
 TARGET = webcontrol
 MACRO = 
-CFLAGS += -O2 -lpthread
+CFLAGS += -O2 -lpthread -std=c11
 SOURCES = $(wildcard *.c)
 OBJS := $(patsubst %.c, %.o,$(SOURCES))
 CC = gcc

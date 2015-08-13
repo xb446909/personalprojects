@@ -4,6 +4,7 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -18,7 +19,7 @@ extern int port;
 extern char dev_name[MAX_FILEPATH];
 extern int nBurdrate;
 extern int nDatWidth;
-extern char cEvent;
+extern int cEvent;
 extern int nStop;
 
 
@@ -114,19 +115,19 @@ void process_all(void)
 
 void*   recv_shortmessage(void* arg)
 {    
-    int fd = opencom("/dev/ttyS0");
+    int fd = opencom(DEFAULT_DEV);
     
     if(fd < 0)
     {
         perror("open error\n");
-        return;
+        return NULL;
     }
 
-    int i = set_opt(fd, 115200, 8, 'N', 1);
+    int i = set_opt(fd, DEFAULT_BURD, DEFAULT_WIDTH, DEFAULT_EVENT, DEFAULT_STOP);
     if(i < 0)
     {
         perror("set opt error");
-        return;
+        return NULL;
     }
 
     while(1)
@@ -294,17 +295,17 @@ int set_opt(int fd, int nSpeed, int nBits, char nEvent, int nStop)
 
     switch( nEvent )
     {
-    case 'O':                     //奇校验
+    case 1:                     //奇校验
         newtio.c_cflag |= PARENB;
         newtio.c_cflag |= PARODD;
         newtio.c_iflag |= (INPCK | ISTRIP);
         break;
-    case 'E':                     //偶校验
+    case 2:                     //偶校验
         newtio.c_iflag |= (INPCK | ISTRIP);
         newtio.c_cflag |= PARENB;
         newtio.c_cflag &= ~PARODD;
         break;
-    case 'N':                    //无校验
+    case 0:                    //无校验
         newtio.c_cflag &= ~PARENB;
         break;
     }

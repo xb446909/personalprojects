@@ -16,17 +16,15 @@ int nDatWidth = 0;
 int nEvent = 0;
 int nStop = 0;
 
-/*struct ParamStruct param_list[] = {
+struct ParamStruct param_list[] = {
     "RemoteHost", 'S', hostname,
-    "RemotePort", 'I', port,
+    "RemotePort", 'I', &port,
     "SerialDev" , 'S', dev_name,
-    "Burdrate"  , 'I', nBurdrate,
-    "DataWidth" , 'I', nDatWidth,
-    "OddEven"   , 'I', nEvent,
-    "StopBits"  , 'I', nStop};
-*/
+    "Burdrate"  , 'I', &nBurdrate,
+    "DataWidth" , 'I', &nDatWidth,
+    "OddEven"   , 'I', &nEvent,
+    "StopBits"  , 'I', &nStop};
 
-struct ParamStruct p = {"aaa", 'S', hostname};
 
 void read_config(const char* config_file);
 int str_analyz(const char* str, char* name, char* value);
@@ -34,38 +32,43 @@ int str_analyz(const char* str, char* name, char* value);
 int main(int argc, char** argv)
 {
     int result;
+    char config_name[MAX_FILEPATH] = { 0 };
 
-    read_config("config.ini");
-    return 0;
-    
     opterr = 0;
+
     port = DEFAULT_PORT;
     strcpy(hostname, DEFAULT_HOST);
+    strcpy(dev_name, DEFAULT_DEV);
+    nBurdrate = DEFAULT_BURD;
+    nDatWidth = DEFAULT_WIDTH;
+    nEvent = DEFAULT_EVENT;
+    nStop = DEFAULT_STOP;
+    strcpy(config_name, DEFAULT_CONFIG);
 
-    while((result = getopt(argc, argv, "i:p:h")) != -1)
+
+    while((result = getopt(argc, argv, "c:h")) != -1)
     {
         switch(result)
         {
-            case 'i':
-                strcpy(hostname, optarg);
-                break;
-            case 'p':
-                port = atoi(optarg);
+            case 'c':
+                strcpy(config_name, optarg);
                 break;
             case 'h':
-                fprintf(stderr, "Usage: %s [-i ip] [-p port]\n", argv[0]);
+                fprintf(stderr, "Usage: %s [-c configfile]\n", argv[0]);
                 exit(0);
                 break;
             case '?':
-                fprintf(stderr, "Usage: %s [-i ip] [-p port]\n", argv[0]);
+                fprintf(stderr, "Usage: %s [-c configfile]\n", argv[0]);
                 exit(0);
                 break;
             default:
-                fprintf(stderr, "Usage: %s [-i ip] [-p port]\n", argv[0]);
+                fprintf(stderr, "Usage: %s [-c configfile]\n", argv[0]);
                 exit(0);
                 break;
         }
     }
+    read_config(config_name);
+
     process_all();
 }
 
@@ -117,14 +120,19 @@ void read_config(const char* config_file)
         if(read_buf[0] == '#') continue;
         read_buf[strlen(read_buf) - 1] = '\0';
         if(!str_analyz(read_buf, name, value)) continue;
-        printf("name: %s, value: %s\n", name, value);
-        if(!strcmp(read_buf, "RemoteHost"))
+        for(i = 0; i < (sizeof(param_list) / sizeof(struct ParamStruct)); i++)
         {
-            strcpy(hostname, value);
-        }
-        if(!strcmp(read_buf, "RemoteHost"))
-        {
-            strcpy(hostname, read_buf);
+            if(strcmp(name, param_list[i].name) == 0)
+            {
+                if(param_list[i].SorI == 'I')
+                {
+                    *(int*)param_list[i].pParam = atoi(value);
+                }
+                else
+                {
+                    strcpy(param_list[i].pParam, value);
+                }
+            }
         }
         memset(read_buf, 0, CMD_BUF_LEN);
     }
