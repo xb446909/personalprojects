@@ -1,22 +1,25 @@
-CC=gcc
-TARGET=webcontrol
-CFLAGS=-O2 -lpthread
-
-OBJ=main.o process.o
+TARGET = webcontrol
+MACRO = 
+CFLAGS += -O2 -lpthread
+SOURCES = $(wildcard *.c)
+OBJS := $(patsubst %.c, %.o,$(SOURCES))
+CC = gcc
 
 default: all
 
-$(OBJ): %.o: %.c
-	@$(CC) $< -c
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS)  -D$(MACRO) $(CFLAGS) -o $(TARGET)
+	
+sinclude $(SOURCES:.c=.d)
 
-$(TARGET): $(OBJ)
-	@$(CC) $(OBJ) $(CFLAGS) -o $(TARGET)
+%d: %c
+	@$(CC) -MM $(CFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ ,g' < $@.$$$$ > $@; \
+	rm $@.$$$$ 
 
 .PHONY: clean all
 
 clean:
-	@rm $(OBJ) $(TARGET) -f
-	
-all:$(TARGET)
+	@rm -rf $(OBJS) $(TARGET) *.d
 
-
+all: $(TARGET)
