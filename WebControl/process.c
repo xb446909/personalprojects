@@ -15,6 +15,13 @@
 
 extern char hostname[CMD_BUF_LEN];
 extern int port;
+extern char dev_name[MAX_FILEPATH];
+extern int nBurdrate;
+extern int nDatWidth;
+extern char cEvent;
+extern int nStop;
+
+
 int sockfd;
 char recv_buf[CMD_BUF_LEN] = { 0 };
 char proc_buf[CMD_BUF_LEN] = { 0 };
@@ -341,6 +348,5 @@ int set_opt(int fd, int nSpeed, int nBits, char nEvent, int nStop)
         perror("com set error");
         return -1;
     }
-    printf("set done!\n");
     return 0;
 }

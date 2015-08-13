@@ -96,7 +96,6 @@ void*   keeponline(void* arg)
         printf("recvfrom %s:%d length: %d, recv: %s\n", 
                 inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port,
                 read_len, recv_buf);
-        sleep(1);
         send_msg(clientAddr, "Received!\n");
     }
 }
