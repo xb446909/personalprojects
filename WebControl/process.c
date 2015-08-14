@@ -24,7 +24,8 @@ extern int nStop;
 
 
 int sockfd;
-char recv_buf[CMD_BUF_LEN] = { 0 };
+char server_recv_buf[CMD_BUF_LEN] = { 0 };
+char short_recv_buf[CMD_BUF_LEN] = { 0 };
 char proc_buf[CMD_BUF_LEN] = { 0 };
 int child_pid;
 pthread_t keeponline_thread;
@@ -68,8 +69,6 @@ void process_all(void)
 
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         
-        debug("Connecting to %s:%d\n", hostname, port);
-
         if(sockfd == -1)
         {
             debug("Create socket error, %d\n", errno);
@@ -79,6 +78,8 @@ void process_all(void)
         addr_ser.sin_family = AF_INET;
         memcpy(&addr_ser.sin_addr.s_addr, phost->h_addr_list[0], phost->h_length);
         addr_ser.sin_port = htons(port);
+
+        debug("Connecting to %s(%s):%d\n", hostname, inet_ntoa(addr_ser.sin_addr), port);
 
         sendto(sockfd, "Hello!", strlen("Hello!"), 0,
             (struct sockaddr*)&addr_ser, sizeof(addr_ser));
@@ -132,10 +133,10 @@ void*   recv_shortmessage(void* arg)
 
     while(1)
     {
-        memset(recv_buf, 0, CMD_BUF_LEN);
-        int n = read(fd, recv_buf, CMD_BUF_LEN);
-        if(n > 0)
-            printf("%s", recv_buf);
+        memset(short_recv_buf, 0, CMD_BUF_LEN);
+        int n = read(fd, short_recv_buf, CMD_BUF_LEN);
+        //if(n > 0)
+            //printf("%s", short_recv_buf);
     }
 
 }
@@ -143,14 +144,19 @@ void*   recv_shortmessage(void* arg)
 
 void*   recv_servermessage(void* arg)
 {
-    struct sockaddr_in addr_ser = { 0 };
-    int len = 0;
+    struct sockaddr_in clientAddr = { 0 };
+    int len = sizeof(clientAddr);
+    int n;
 
     while(1)
     {
-        recvfrom(sockfd, recv_buf, CMD_BUF_LEN, 0, 
-                (struct sockaddr*)&addr_ser, &len);
-        process_command(recv_buf);
+        memset(server_recv_buf, 0, CMD_BUF_LEN);
+        n = recvfrom(sockfd, server_recv_buf, CMD_BUF_LEN, 0, 
+                (struct sockaddr*)&clientAddr, &len);
+        printf("recvfrom %s:%d length: %d, recv: %s\n", 
+                inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port,
+                n, server_recv_buf);
+        process_command(server_recv_buf);
     }
 }
 
