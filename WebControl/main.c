@@ -31,6 +31,7 @@ int str_analyz(const char* str, char* name, char* value);
 
 int main(int argc, char** argv)
 {
+	int i;
     int result;
     char config_name[MAX_FILEPATH] = { 0 };
 
@@ -68,6 +69,18 @@ int main(int argc, char** argv)
         }
     }
     read_config(config_name);
+
+	for (i = 0; i < (sizeof(param_list) / sizeof(struct ParamStruct)); i++)
+	{
+		if (param_list[i].SorI == 'I')
+		{
+			debug("%s: %d\n", param_list[i].name, *(int*)param_list[i].pParam);
+		}
+		else
+		{
+			debug("%s: %s\n", param_list[i].name, (char*)param_list[i].pParam);
+		}
+	}
 
     process_all();
 }
@@ -112,6 +125,8 @@ void read_config(const char* config_file)
         debug("Can not open config file: %s\n", config_file);
         return;
     }
+
+	debug("Open config file: %s\n", config_file);
 
     fseek(fd, 0, SEEK_SET);
 
