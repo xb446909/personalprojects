@@ -1,6 +1,6 @@
 TARGET = webcontrol
 MACRO = 
-CFLAGS += -O2 -lpthread -std=gnu99
+CFLAGS += -O2 -lpthread -lcrypto -lglib-2.0.dll -std=gnu99
 SOURCES = $(wildcard *.c)
 OBJS := $(patsubst %.c, %.o,$(SOURCES))
 CC = gcc

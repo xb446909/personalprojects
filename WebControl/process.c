@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <openssl/md5.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <termios.h>
@@ -48,6 +49,9 @@ void	com_write(char* msg);
 int     opencom(char* dev);
 int     set_opt(int fd, int nSpeed, int nBits, char nEvent, int nStop);
 void    splitstr(char* src, char* dst);
+void	base64_decode(char *src, char *dst, int *decode_len);
+void	calc_md5(char* src, char* dst);
+void	crypto(char* src, int encode, char* key, char* dst, int expiry);
 
 
 void send_msg(char* msg)
@@ -71,6 +75,9 @@ void process_all(void)
 	int res;
 
 	phost = gethostbyname(hostname);
+
+	char* dst[513] = { 0 };
+	char* src[513] = { 0 };
 
 	if (phost == NULL)
 	{
@@ -411,4 +418,227 @@ int set_opt(int fd, int nSpeed, int nBits, char nEvent, int nStop)
 		return -1;
 	}
 	return 0;
+}
+
+void base64_decode(char *src, char *dst, int *decode_len)
+{
+	char *q = malloc(strlen(src) + 1);
+	char *p = dst;
+	char *temp = q;
+	char *s = src;
+	int len = strlen(src), i;
+	memset(q, 0, strlen(src) + 1);
+	while (*s)
+	{
+		if (*s >= 'A'&&*s <= 'Z') *temp = *s - 'A';
+		else if (*s >= 'a'&&*s <= 'z') *temp = *s - 'a' + 26;
+		else if (*s >= '0'&&*s <= '9') *temp = *s - '0' + 52;
+		else if (*s == '+') *temp = 62;
+		else if (*s == '/') *temp = 63;
+		else if (*s == '=') *temp = -1;
+		else
+		{
+			printf("\n%c:Not a valid base64 string\n", *s);
+			exit(0);
+		}
+		++s;
+		++temp;
+	}
+	for (i = 0; i<len - 4; i += 4)
+	{
+		*p++ = (*(q + i) << 2) + (*(q + i + 1) >> 4);
+		*p++ = (*(q + i + 1) << 4) + (*(q + i + 2) >> 2);
+		*p++ = (*(q + i + 2) << 6) + (*(q + i + 3));
+	}
+	if (*(q + i + 3) != -1)
+	{
+		*p++ = (*(q + i) << 2) + (*(q + i + 1) >> 4);
+		*p++ = (*(q + i + 1) << 4) + (*(q + i + 2) >> 2);
+		*p++ = (*(q + i + 2) << 6) + *(q + i + 3);
+	}
+	else if (*(q + i + 2) != -1)
+	{
+		*p++ = (*(q + i) << 2) + (*(q + i + 1) >> 4);
+		*p++ = (*(q + i + 1) << 4) + (*(q + i + 2) >> 2);
+		*p++ = (*(q + i + 2) << 6);
+	}
+	else if (*(q + i + 1) != -1)
+	{
+		*p++ = (*(q + i) << 2) + (*(q + i + 1) >> 4);
+		*p++ = (*(q + i + 1) << 4);
+	}
+	else
+	{
+		printf("Not a valid base64 string\n");
+		exit(0);
+	}
+	*p = 0;
+	*decode_len = len * 6 / 8;
+	free(q);
+}
+
+/**
+* 加密解密函数
+* @param char* src 待加密解密字符串
+* @param int encode 操作方法 非0加密 0解密
+* @param char* key 加密解密效验码
+* @param char* dst 处理后的字符串
+*/
+void	crypto(char* src, int encode, char* key, char* dst, int expiry)
+{
+	char key1[33] = { '\0' };
+	char keya[33] = { '\0' };
+	char keyb[33] = { '\0' };
+	char key1a[17] = { '\0' };
+	char key1b[17] = { '\0' };
+
+	char tempstr[65] = { '\0' };
+	time_t t;
+	int i, j, k, temp;
+
+	int ckey_len = 4;
+	char* keyc = (char*)malloc(ckey_len + 1);
+	memset(keyc, '\0', ckey_len + 1);
+
+	calc_md5(key, key1);
+	memcpy(key1a, key1, 16);
+	memcpy(key1b, &key1[16], 16);
+	calc_md5(key1a, keya);
+	calc_md5(key1b, keyb);
+	if (ckey_len)
+	{
+		if (encode)
+		{
+			time(&t);
+			sprintf(tempstr, "%032ld", t);
+			memcpy(keyc, &tempstr[strlen(tempstr) - ckey_len], ckey_len);
+		}
+		else
+		{
+			memcpy(keyc, src, ckey_len);
+		}
+	}
+
+	char cryptkey[65] = { '\0' };
+	strcpy(tempstr, keya);
+	strcat(tempstr, keyc);
+	calc_md5(tempstr, cryptkey);
+	strcpy(tempstr, keya);
+	strcat(tempstr, cryptkey);
+	strcpy(cryptkey, tempstr);
+
+	int key_len = strlen(cryptkey);
+	int str_len;
+
+	char str[257] = { '\0' };
+	char* decode_str;
+	char* encode_str;
+	int decode_size;
+	if (encode)
+	{
+		time(&t);
+		sprintf(str, "%010d", expiry ? expiry + t : 0);
+		strcpy(tempstr, src);
+		strcat(tempstr, keyb);
+		calc_md5(tempstr, keya);
+		memset(tempstr, 0, 65);
+		memcpy(tempstr, keya, 16);
+		strcat(str, tempstr);
+		strcat(str, src);
+		str_len = strlen(str);
+	}
+	else
+	{
+		memset(tempstr, 0, 65);
+		strcpy(tempstr, &src[ckey_len]);
+		base64_decode(tempstr, str, &str_len);
+	}
+
+	int box[256] = { 0 };
+	int rndkey[256] = { 0 };
+	for (i = 0; i < 256; i++)
+	{
+		box[i] = i;
+		rndkey[i] = (int)cryptkey[i % key_len];
+	}
+	for (i = 0, j = 0; i < 256; i++)
+	{
+		j = (j + box[i] + rndkey[i]) % 256;
+		k = box[i];
+		box[i] = box[j];
+		box[j] = k;
+	}
+	unsigned char* result = (unsigned char*)malloc(strlen + 1);
+	memset(result, '\0', strlen + 1);
+	for (i = 0, j = 0, k = 0; i < str_len; i++)
+	{
+		k = (k + 1) % 256;
+		j = (j + box[k]) % 256;
+		temp = box[k];
+		box[k] = box[j];
+		box[j] = temp;
+		result[i] = str[i] ^ (box[(box[j] + box[k]) % 256]);
+	}
+
+	time_t t_tmp;
+	char* encode_tmp;
+	int encode_size;
+	if (encode)
+	{
+		encode_str = g_base64_encode(result, str_len);
+		encode_size = strlen(encode_str);
+		encode_tmp = (char*)malloc(encode_size + 1);
+		memset(encode_tmp, '\0', encode_size + 1);
+		for (i = 0, j = 0; i < encode_size; i++)
+		{
+			if (encode_str[i] != '=')
+			{
+				encode_tmp[j] = encode_str[i];
+				j++;
+			}
+		}
+		g_free(encode_str);
+		strcpy(dst, keyc);
+		strcat(dst, encode_tmp);
+		free(encode_tmp);
+	}
+	else
+	{
+		memset(tempstr, 0, 65);
+		memcpy(tempstr, result, 10);
+		t_tmp = atol(tempstr);
+		time(&t);
+
+		memset(tempstr, 0, 65);
+		strcpy(tempstr, &result[26]);
+		strcat(tempstr, keyb);
+		calc_md5(tempstr, str);
+		memset(tempstr, 0, 65);
+		memcpy(tempstr, str, 16);
+		memset(str, 0, 257);
+		memcpy(str, &result[10], 16);
+		if (((t_tmp == 0) || (t_tmp - t) > 0) && (strcmp(str, tempstr) == 0))
+		{
+			strcpy(dst, &result[26]);
+		}
+	}
+	free(result);
+	free(keyc);
+}
+
+void	calc_md5(char* src, char* dst)
+{
+	int i;
+	MD5_CTX ctx;
+	unsigned char md[16] = { 0 };
+	char temp[3] = { 0 };
+	memset(dst, '\0', 33);
+	MD5_Init(&ctx);
+	MD5_Update(&ctx, src, strlen(src));
+	MD5_Final(md, &ctx);
+	for (i = 0; i < 16; i++)
+	{
+		sprintf(temp, "%2.2x", md[i]);
+		strcat(dst, temp);
+	}
 }
