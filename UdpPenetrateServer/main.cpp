@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <pthread.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string>
 
 #include "ClientList.h"
 #include "logger.h"
@@ -17,11 +19,13 @@
 
 void ProcessMsg();
 void send_msg(struct sockaddr_in remoteaddr, char* msg);
+void* udp_penetrate(void* arg);
 
 int port = DEFAULT_PORT;
 char recv_buf[CMD_BUF_LEN] = { 0 };
 int sockfd = 0;
 struct sockaddr_in addr_ser = { 0 };
+pthread_t penetrate_thread;
 
 int main (int argc, char** argv)
 {
@@ -51,6 +55,21 @@ int main (int argc, char** argv)
 		}
 	}
 
+	result = pthread_create(&penetrate_thread, NULL, udp_penetrate, NULL);
+	if (result != 0)
+	{
+		debug("Thread creation failed!");
+		exit(0);
+	}
+
+	while (1)
+	{
+		sleep(10);
+	}
+}
+
+void* udp_penetrate(void* arg)
+{
 	ProcessMsg();
 }
 
@@ -91,7 +110,7 @@ void ProcessMsg()
 		printf("recvfrom %s:%d length: %d, recv: %s\n",
 			inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port,
 			read_len, recv_buf);
-		send_msg(clientAddr, "Received!\n");
+		send_msg(clientAddr, (char*)"Received!\n");
 	}
 }
 
