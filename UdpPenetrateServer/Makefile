@@ -1,6 +1,6 @@
 TARGET = udpserver
 MACRO = 
-CFLAGS += -O2 -lpthread
+CFLAGS += -O2 -lpthread -lsqlite3
 SOURCES = $(wildcard *.cpp)
 OBJS := $(patsubst %.cpp, %.o,$(SOURCES))
 CC = g++

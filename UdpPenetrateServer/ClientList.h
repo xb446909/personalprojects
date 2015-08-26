@@ -2,6 +2,7 @@
 #define __CCLIENT_H_
 
 #include <vector>
+#include <sstream>
 #include <arpa/inet.h>
 #include <sqlite3.h>
 
@@ -9,8 +10,9 @@ typedef struct ClientList_Struct
 {
 	char name[16];
 	struct sockaddr_in addr;
-	time_t lastOnline;
 }ClientInfo;
+
+#define	TABLE_NAME	" ClientInfo "
 
 class CClientList
 {
@@ -22,11 +24,9 @@ public:
 
 private:
 	static CClientList* m_clientList;
-	sqlite3* db;
 public:
-	void print();
+	void test();
 	void RegClient(ClientInfo info);
-
 
 };
 

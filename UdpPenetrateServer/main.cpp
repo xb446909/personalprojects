@@ -31,7 +31,20 @@ int main (int argc, char** argv)
 {
 	int result = 0;
 
+	//ClientInfo info;
+
+	//strcpy(info.name, "byron");
+	//info.addr.sin_port = htons(10000);
+	//info.addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+	//printf("sin_port = %d\n", info.addr.sin_port);
+
 	CClientList::Get()->Init();
+	//CClientList::Get()->RegClient(info);
+	//CClientList::Get()->test();
+	//sleep(2);
+	//CClientList::Get()->RegClient(info);
+	//CClientList::Get()->test();
 
 	while ((result = getopt(argc, argv, "p:h")) != -1)
 	{
@@ -78,6 +91,9 @@ void ProcessMsg()
 	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	int err;
 	int read_len = 0;
+	char tmp[5] = { 0 };
+
+	ClientInfo info;
 
 	if (sockfd == -1)
 	{
@@ -105,11 +121,21 @@ void ProcessMsg()
 	while (1)
 	{
 		memset(recv_buf, '\0', CMD_BUF_LEN);
+		memset(tmp, '\0', 5);
 		read_len = recvfrom(sockfd, recv_buf, CMD_BUF_LEN, 0,
 			(struct sockaddr*)&clientAddr, &len);
 		printf("recvfrom %s:%d length: %d, recv: %s\n",
 			inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port,
 			read_len, recv_buf);
+
+		memcpy(tmp, recv_buf, 4);
+
+		if (strcmp(tmp, "#REG") == 0)
+		{
+			strcpy(info.name, &recv_buf[4]);
+			memcpy(&info.addr, &clientAddr, len);
+			CClientList::Get()->RegClient(info);
+		}
 		send_msg(clientAddr, (char*)"Received!\n");
 	}
 }
