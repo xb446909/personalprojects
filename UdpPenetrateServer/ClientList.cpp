@@ -72,7 +72,7 @@ void CClientList::Init()
 
 void CClientList::test()
 {
-/*	sql.str("");
+	sql.str("");
 	sql << "insert into " << TABLE_NAME << "(name, ip, port, lastTime) values('111', '10.10.10.10', 1234, 1111111111)";
 
 	rc = sqlite3_exec(db, sql.str().c_str(), callback, 0, &zErrMsg);
@@ -96,11 +96,11 @@ void CClientList::test()
 
 
 	sql.str("");
-	sql << "select lastTime from " << TABLE_NAME << " where ip = '10.10.10.10' and port = 12345";
+	sql << "select * from " << TABLE_NAME << " where ip != '10.10.10.10' or port != 1234";
 	cout << sql.str() << endl;
 
-	rc = sqlite3_get_table(db, sql.str().c_str(), &azResult, &nrow, &ncolumn, &zErrMsg);
-	//rc = sqlite3_exec(db, sql.str().c_str(), callback, 0, &zErrMsg);
+	//rc = sqlite3_get_table(db, sql.str().c_str(), &azResult, &nrow, &ncolumn, &zErrMsg);
+	rc = sqlite3_exec(db, sql.str().c_str(), callback, 0, &zErrMsg);
 	if (rc != SQLITE_OK)
 	{
 	fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -109,13 +109,13 @@ void CClientList::test()
 	}
 
 
-	cout << "Row:" << nrow << endl << "Column:" << ncolumn << endl;
+	/*	cout << "Row:" << nrow << endl << "Column:" << ncolumn << endl;
 	if (nrow * ncolumn)
 	{
 		cout << "Result:" << azResult[1] << endl;
 	}
 	sqlite3_free_table(azResult);
-	*/
+	
 	sql.str("");
 	sql << "select * from " << TABLE_NAME;
 	cout << sql.str() << endl;
@@ -127,7 +127,7 @@ void CClientList::test()
 		sqlite3_free(zErrMsg);
 		exit(0);
 	}
-
+	*/
 	cout << "This is print from ClientList" << endl;
 }
 
@@ -182,4 +182,23 @@ void CClientList::RegClient(ClientInfo info)
 	}
 	sqlite3_free_table(azResult);
 	cout << info.name << " from " << inet_ntoa(info.addr.sin_addr) << ":" << ntohs(info.addr.sin_port) << endl;
+}
+
+void CClientList::GetClients(ClientInfo info)
+{
+	time_t t;
+	sql.str("");
+	sql << "select * from " << TABLE_NAME << "where ip!='" << inet_ntoa(info.addr.sin_addr) << "' or port!=" << info.addr.sin_port;
+
+	rc = sqlite3_get_table(db, sql.str().c_str(), &azResult, &nrow, &ncolumn, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+		exit(0);
+	}
+
+	time(&t);
+
+	
 }

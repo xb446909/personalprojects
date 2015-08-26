@@ -31,20 +31,10 @@ int main (int argc, char** argv)
 {
 	int result = 0;
 
-	//ClientInfo info;
-
-	//strcpy(info.name, "byron");
-	//info.addr.sin_port = htons(10000);
-	//info.addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-	//printf("sin_port = %d\n", info.addr.sin_port);
-
 	CClientList::Get()->Init();
-	//CClientList::Get()->RegClient(info);
-	//CClientList::Get()->test();
-	//sleep(2);
-	//CClientList::Get()->RegClient(info);
-	//CClientList::Get()->test();
+
+	CClientList::Get()->test();
+
 
 	while ((result = getopt(argc, argv, "p:h")) != -1)
 	{

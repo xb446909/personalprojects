@@ -27,7 +27,7 @@ private:
 public:
 	void test();
 	void RegClient(ClientInfo info);
-
+	void GetClients(ClientInfo info);
 };
 
 
