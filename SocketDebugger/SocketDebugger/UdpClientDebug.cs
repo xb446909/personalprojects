@@ -85,8 +85,8 @@ namespace SocketDebugger
             }
 
             EndPoint sendep = new IPEndPoint(address.AddressList[index], port);
-            so.workSocket.SendTo(Encoding.Default.GetBytes(msg + "\r\n"),
-                Encoding.Default.GetByteCount(msg + "\r\n"), 0, sendep);
+            so.workSocket.SendTo(Encoding.Default.GetBytes(msg + "\0"),
+                Encoding.Default.GetByteCount(msg + "\0"), 0, sendep);
 
             UdpClientBeginRecv();
         }

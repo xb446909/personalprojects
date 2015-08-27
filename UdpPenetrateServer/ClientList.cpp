@@ -228,7 +228,7 @@ void CClientList::GetClients(ClientInfo info)
 			pInfo[i - 1].addr.sin_port = atoi(azResult[i * 4 + 2]);
 			memcpy(pInfo[i - 1].name, azResult[i * 4], 16);
 
-			cout << "name:" << pInfo[i - 1].name << "addr: " << inet_ntoa(pInfo[i - 1].addr.sin_addr) << ":" << pInfo[i - 1].addr.sin_port << endl;
+			cout << "name:" << pInfo[i - 1].name << " addr: " << inet_ntoa(pInfo[i - 1].addr.sin_addr) << ":" << ntohs(pInfo[i - 1].addr.sin_port) << endl;
 		}
 		send_clientinfo(info.addr, nrow, pInfo);
 		delete[] pInfo;
