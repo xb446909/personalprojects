@@ -8,11 +8,12 @@
 
 typedef struct ClientList_Struct
 {
-	char name[16];
+	char name[17];
 	struct sockaddr_in addr;
 }ClientInfo;
 
 #define	TABLE_NAME	" ClientInfo "
+#define TIME_OUT_S	20
 
 class CClientList
 {

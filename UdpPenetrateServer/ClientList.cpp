@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -27,7 +28,8 @@ CClientList::~CClientList()
 
 CClientList* CClientList::m_clientList = 0;
 
-extern void send_msg(struct sockaddr_in remoteaddr, char* msg);
+extern void send_msg(struct sockaddr_in remoteaddr,const char* msg);
+extern void send_clientinfo(struct sockaddr_in remoteaddr, int num, ClientInfo* pInfo);
 
 static int callback(void *nEvent, int argc, char **argv, char **azColName)
 {
@@ -187,6 +189,19 @@ void CClientList::RegClient(ClientInfo info)
 void CClientList::GetClients(ClientInfo info)
 {
 	time_t t;
+	time(&t);
+
+	sql.str("");
+	sql << "delete from " << TABLE_NAME << "where lastTime < " << t - TIME_OUT_S;
+
+	rc = sqlite3_exec(db, sql.str().c_str(), callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK)
+	{
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+		exit(0);
+	}
+
 	sql.str("");
 	sql << "select * from " << TABLE_NAME << "where ip!='" << inet_ntoa(info.addr.sin_addr) << "' or port!=" << info.addr.sin_port;
 
@@ -198,7 +213,24 @@ void CClientList::GetClients(ClientInfo info)
 		exit(0);
 	}
 
-	time(&t);
+	sql.str("");
+	sql << nrow;
 
-	
+	send_msg(info.addr, sql.str().c_str());
+
+	if (nrow > 0)
+	{
+		ClientInfo* pInfo = new ClientInfo[nrow];
+		for (int i = 1; i <= nrow; i++)
+		{
+			pInfo[i - 1].addr.sin_family = AF_INET;
+			pInfo[i - 1].addr.sin_addr.s_addr = inet_addr(azResult[i * 4 + 1]);
+			pInfo[i - 1].addr.sin_port = atoi(azResult[i * 4 + 2]);
+			memcpy(pInfo[i - 1].name, azResult[i * 4], 16);
+
+			cout << "name:" << pInfo[i - 1].name << "addr: " << inet_ntoa(pInfo[i - 1].addr.sin_addr) << ":" << pInfo[i - 1].addr.sin_port << endl;
+		}
+		send_clientinfo(info.addr, nrow, pInfo);
+		delete[] pInfo;
+	}
 }

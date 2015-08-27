@@ -18,7 +18,8 @@
 #define CMD_BUF_LEN  1024
 
 void ProcessMsg();
-void send_msg(struct sockaddr_in remoteaddr, char* msg);
+void send_msg(struct sockaddr_in remoteaddr,const char* msg);
+void send_clientinfo(struct sockaddr_in remoteaddr, int num, ClientInfo* pInfo);
 void* udp_penetrate(void* arg);
 
 int port = DEFAULT_PORT;
@@ -33,7 +34,7 @@ int main (int argc, char** argv)
 
 	CClientList::Get()->Init();
 
-	CClientList::Get()->test();
+	//CClientList::Get()->test();
 
 
 	while ((result = getopt(argc, argv, "p:h")) != -1)
@@ -83,7 +84,7 @@ void ProcessMsg()
 	int read_len = 0;
 	char tmp[5] = { 0 };
 
-	ClientInfo info;
+	ClientInfo info = { 0 };
 
 	if (sockfd == -1)
 	{
@@ -114,25 +115,34 @@ void ProcessMsg()
 		memset(tmp, '\0', 5);
 		read_len = recvfrom(sockfd, recv_buf, CMD_BUF_LEN, 0,
 			(struct sockaddr*)&clientAddr, &len);
-		printf("recvfrom %s:%d length: %d, recv: %s\n",
-			inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port,
-			read_len, recv_buf);
+		//printf("recvfrom %s:%d length: %d, recv: %s\n",	inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port,read_len, recv_buf);
 
 		memcpy(tmp, recv_buf, 4);
 
 		if (strcmp(tmp, "#REG") == 0)
 		{
-			strcpy(info.name, &recv_buf[4]);
+			memcpy(&info.name, &recv_buf[4], 16);
 			memcpy(&info.addr, &clientAddr, len);
 			CClientList::Get()->RegClient(info);
 		}
-		send_msg(clientAddr, (char*)"Received!\n");
+		if (strcmp(tmp, "#LST") == 0)
+		{
+			memcpy(&info.addr, &clientAddr, len);
+			CClientList::Get()->GetClients(info);
+		}
+		//send_msg(clientAddr, (char*)"Received!\n");
 	}
 }
 
-void send_msg(struct sockaddr_in remoteaddr, char* msg)
+void send_msg(struct sockaddr_in remoteaddr,const char* msg)
 {
 	sendto(sockfd, msg, strlen(msg), 0,
+		(struct sockaddr*)&remoteaddr, sizeof(struct sockaddr));
+}
+
+void send_clientinfo(struct sockaddr_in remoteaddr, int num, ClientInfo* pInfo)
+{
+	sendto(sockfd, pInfo, num * sizeof(ClientInfo), 0,
 		(struct sockaddr*)&remoteaddr, sizeof(struct sockaddr));
 }
 

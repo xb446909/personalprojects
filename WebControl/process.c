@@ -232,32 +232,125 @@ void*   keeponline(void* arg)
 	}
 }
 
+/*
+(1)配置指令：#cfg
+1)配置更新 #cfg#upconfig
+2)固件更新 #cfg#upfirmware
+(2)文件指令：#fls
+1)资源更新 #fls#upsource
+2)资源删除 #fls#delsource
+3)播放列表更新 #fls#uplist
+4)子播放列表添加 #fls#addchildlist
+5)子播放列表更新 #fls#upchildlist
+6)子播放列表删除 #fls#delchildlist
+(3)播放指令 #mdi
+1)暂停 #mdi#pause
+2)播放 #mdi#play
+3)上一个 #mdi#next
+4)下一个 #mdi#prev
+5)播放路况（电信号）
+6)播放倒计时（电信号）
+7)播放广告（电信号）
+(4)系统指令 #sys
+1)开户屏幕 #sys#openled
+2)关闭屏幕 #sys#closeled
+3)重启系统 #sys#rebootsys
+4)重启程序 #sys#rebootpro
+*/
+
 void process_command(char* cmd)
 {
 	char file_cwd[MAX_FILEPATH] = { 0 };
 	getcwd(file_cwd, MAX_FILEPATH);
 
-	if (cmd[0] != '@')
+	if (cmd[0] != '#')
 	{
 		debug("Unknown command (%s) received!\n", cmd);
 		return;
 	}
+
 	switch (cmd[1])
 	{
-	case 'a':
+	case 'c':
+		if (strcmp(&cmd[5], "upconfig") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "upfirmware") == 0)
+		{
+			break;
+		}
 		send_msg("Receive a");
 		system("rm log.txt -f");
 		break;
-	case 'A':
+	case 'f':
+		if (strcmp(&cmd[5], "upsource") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "delsource") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "uplist") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "addchildlist") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "upchildlist") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "delchildlist") == 0)
+		{
+			break;
+		}
 		send_msg("Receive A");
 		//sprintf(file_cwd, "%s/test.exe", file_cwd);
-		child_pid = create_process("/usr/bin/omxplayer", "/usr/bin/omxplayer -b /home/pi/20110729005.mp4");
 		break;
-	case 'b':
+	case 'm':
+		if (strcmp(&cmd[5], "pause") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "play") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "next") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "prev") == 0)
+		{
+			break;
+		}
+		child_pid = create_process("/usr/bin/omxplayer", "/usr/bin/omxplayer -b /home/pi/20110729005.mp4");
 		send_msg("Receive b");
 		sprintf(proc_buf, "kill %d", child_pid);
 		printf("b: %s\n", proc_buf);
 		system(proc_buf);
+		break;
+	case 's':
+		if (strcmp(&cmd[5], "openled") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "closeled") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "rebootsys") == 0)
+		{
+			break;
+		}
+		if (strcmp(&cmd[5], "rebootpro") == 0)
+		{
+			break;
+		}
 		break;
 	default:
 		send_msg("Unknown command");
