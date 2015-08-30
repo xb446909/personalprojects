@@ -6,11 +6,13 @@
         xmlns:local="clr-namespace:UdpCommunication"
         mc:Ignorable="d"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
-        Title="MainWindow" Height="350" Width="525" Icon="bitbug_favicon.ico" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
+        Title="MainWindow" Height="350" Width="600" Icon="bitbug_favicon.ico" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80*"/>
-            <ColumnDefinition Width="20*"/>
+            <ColumnDefinition Width="70*"/>
+            <ColumnDefinition Width="30*"/>
         </Grid.ColumnDefinitions>
         <Canvas x:Name="CloseBtn" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" MouseLeftButtonUp="OnCloseWindow" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave" Grid.Column="1">
             <Path Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z" Fill="Black" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center" HorizontalAlignment="Center" >
@@ -72,8 +74,15 @@
                 </Path.RenderTransform>
             </Path>
         </Canvas>
-
-        <ListBox x:Name="ClientList" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5,30,5,10" VerticalAlignment="Stretch"/>
-
+        <ListBox x:Name="ClientList" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5,30,5,10" VerticalAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Button Click="Button_Click">
+                        <TextBlock Text="{Binding Path=info, Mode=TwoWay}"/>
+                    </Button>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Label x:Name="label_welcome" Content="" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5" />
     </Grid>
 </Window>

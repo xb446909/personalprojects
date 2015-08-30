@@ -137,7 +137,7 @@ void CClientList::RegClient(ClientInfo info)
 {
 	time_t t;
 	sql.str("");
-	sql << "select * from " << TABLE_NAME << "where ip='" << inet_ntoa(info.addr.sin_addr) << "' and port=" << info.addr.sin_port;
+	sql << "select * from " << TABLE_NAME << "where ip='" << inet_ntoa(info.addr.sin_addr) << "' and port=" << ntohs(info.addr.sin_port);
 
 	rc = sqlite3_get_table(db, sql.str().c_str(), &azResult, &nrow, &ncolumn, &zErrMsg);
 	if (rc != SQLITE_OK)
@@ -155,7 +155,7 @@ void CClientList::RegClient(ClientInfo info)
 		sql << "insert into " << TABLE_NAME << "(name, ip, port, lastTime) values(";
 		sql << "'" << info.name << "', ";
 		sql << "'" << inet_ntoa(info.addr.sin_addr) << "', ";
-		sql << info.addr.sin_port << ", ";
+		sql << ntohs(info.addr.sin_port) << ", ";
 		sql << t << ")";
 
 		rc = sqlite3_exec(db, sql.str().c_str(), callback, 0, &zErrMsg);
@@ -172,7 +172,7 @@ void CClientList::RegClient(ClientInfo info)
 		sql << "update" << TABLE_NAME << "set ";
 		sql << "name='" << info.name << "', ";
 		sql << "lastTime=" << t;
-		sql << " where ip='" << inet_ntoa(info.addr.sin_addr) << "' and port=" << info.addr.sin_port;
+		sql << " where ip='" << inet_ntoa(info.addr.sin_addr) << "' and port=" << ntohs(info.addr.sin_port);
 
 		rc = sqlite3_exec(db, sql.str().c_str(), callback, 0, &zErrMsg);
 		if (rc != SQLITE_OK)
@@ -203,7 +203,7 @@ void CClientList::GetClients(ClientInfo info)
 	}
 
 	sql.str("");
-	sql << "select * from " << TABLE_NAME << "where ip!='" << inet_ntoa(info.addr.sin_addr) << "' or port!=" << info.addr.sin_port;
+	sql << "select * from " << TABLE_NAME << "where ip!='" << inet_ntoa(info.addr.sin_addr) << "' or port!=" << ntohs(info.addr.sin_port);
 
 	rc = sqlite3_get_table(db, sql.str().c_str(), &azResult, &nrow, &ncolumn, &zErrMsg);
 	if (rc != SQLITE_OK)
@@ -220,17 +220,13 @@ void CClientList::GetClients(ClientInfo info)
 
 	if (nrow > 0)
 	{
-		ClientInfo* pInfo = new ClientInfo[nrow];
 		for (int i = 1; i <= nrow; i++)
 		{
-			pInfo[i - 1].addr.sin_family = AF_INET;
-			pInfo[i - 1].addr.sin_addr.s_addr = inet_addr(azResult[i * 4 + 1]);
-			pInfo[i - 1].addr.sin_port = atoi(azResult[i * 4 + 2]);
-			memcpy(pInfo[i - 1].name, azResult[i * 4], 16);
+			sql.str("");
+			sql << azResult[i * 4] << " " << azResult[i * 4 + 1] << ":" << azResult[i * 4 + 2];
+			send_msg(info.addr, sql.str().c_str());
 
-			cout << "name:" << pInfo[i - 1].name << " addr: " << inet_ntoa(pInfo[i - 1].addr.sin_addr) << ":" << ntohs(pInfo[i - 1].addr.sin_port) << endl;
+			cout << sql.str() << endl;
 		}
-		send_clientinfo(info.addr, nrow, pInfo);
-		delete[] pInfo;
 	}
 }

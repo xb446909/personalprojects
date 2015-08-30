@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace UdpCommunication
 {
@@ -34,14 +37,22 @@ namespace UdpCommunication
         Rect normal_rect;
         Brush default_brush = new SolidColorBrush(Color.FromRgb(0xcc, 0xcc, 0xcc));//new SolidColorBrush(Color.FromRgb(83, 92, 168));
 
+        NameWindow m_name;
         RegClient m_regclient;
         Setting setting;
 
         int port = 10000;
         string host = "localhost";
         int interval_s = 10;
+        string name;
 
-        Socket so = new Socket(SocketType.Dgram, ProtocolType.Udp);
+        Thread recv_thread;
+        static Socket socket;
+        static IPEndPoint endpoint;
+
+        static List<ClientInfo> clientlst = new List<ClientInfo>();
+        static ListBox lstbox;
+
 
         public MainWindow()
         {
@@ -53,12 +64,55 @@ namespace UdpCommunication
             minimize = MainGrid.FindName("Minimize") as Canvas;
             restore.Visibility = Visibility.Collapsed;
             Background = default_brush;
+            
+            m_regclient = new RegClient(interval_s, ClientList);
+            recv_thread = new Thread(Receive_Thread);
 
-            m_regclient = new RegClient(interval_s);
+            socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+
+            lstbox = ClientList;
+            lstbox.Items.Clear();
+        }
+
+        private static void Receive_Thread(object param)
+        {
+            EndPoint ep = (EndPoint)endpoint;
+            byte[] buf = new byte[128];
+            int num, len;
+            while (true)
+            {
+                num = 0;
+                len = 0;
+                try
+                {
+                    socket.ReceiveFrom(buf, ref ep);
+                    num = BitConverter.ToInt32(buf, 0) - 48;
+                    clientlst.Clear();
+                    
+                    if (num > 0)
+                    {
+                        for (int i = 0; i < num; i++)
+                        {
+                            len = socket.ReceiveFrom(buf, ref ep);
+                            clientlst.Add(new ClientInfo(Encoding.Default.GetString(buf, 0, len)));
+                        }
+                    }
+
+                    Dispatcher.FromThread((Thread)param).Invoke(new Action(() =>
+                    {
+                        lstbox.ItemsSource = null;
+                        lstbox.ItemsSource = clientlst;
+                    }));
+                }
+                catch (System.Exception e)
+                {
+                    return;
+                }
+            }
         }
 
         private void OnCloseWindow(object sender, MouseButtonEventArgs e)
-        {
+        {      
             Close();
         }
 
@@ -126,6 +180,62 @@ namespace UdpCommunication
                 port = Convert.ToInt32(setting.Text_Port.Text);
                 host = setting.Text_Server.Text;
             }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            m_name = new NameWindow();
+            m_name.Owner = this;
+            if (m_name.ShowDialog() == true)
+            {
+                name = m_name.name;
+                label_welcome.Content = "Welcome " + name + " !";
+            }
+            m_regclient.name = name;
+
+            int index = -1;
+            var address = Dns.GetHostEntry(host);
+            for (int i = 0; i < address.AddressList.Length; i++)
+            {
+                if (address.AddressList[i].AddressFamily == AddressFamily.InterNetwork)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1)
+            {
+                MessageBox.Show("无法从" + host + "获得IP地址.");
+                return;
+            }
+
+            endpoint = new IPEndPoint(address.AddressList[index], port);
+            socket.Connect(endpoint);
+
+            m_regclient.StartFlap(socket, endpoint);
+            recv_thread.Start(Thread.CurrentThread);
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            socket.Close();
+            recv_thread.Abort();
+        }
+    }
+
+    internal class ClientInfo 
+    {
+        public string info { get; set; }
+
+        public ClientInfo(string client_info)
+        {
+            info = client_info;
         }
     }
 }

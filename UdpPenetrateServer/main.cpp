@@ -19,7 +19,6 @@
 
 void ProcessMsg();
 void send_msg(struct sockaddr_in remoteaddr,const char* msg);
-void send_clientinfo(struct sockaddr_in remoteaddr, int num, ClientInfo* pInfo);
 void* udp_penetrate(void* arg);
 
 int port = DEFAULT_PORT;
@@ -140,11 +139,6 @@ void send_msg(struct sockaddr_in remoteaddr,const char* msg)
 		(struct sockaddr*)&remoteaddr, sizeof(struct sockaddr));
 }
 
-void send_clientinfo(struct sockaddr_in remoteaddr, int num, ClientInfo* pInfo)
-{
-	sendto(sockfd, pInfo, num * sizeof(ClientInfo), 0,
-		(struct sockaddr*)&remoteaddr, sizeof(struct sockaddr));
-}
 
 void debug(const char* format, ...)
 {
