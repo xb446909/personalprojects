@@ -77,9 +77,7 @@
         <ListBox x:Name="ClientList" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5,30,5,10" VerticalAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Button Click="Button_Click">
-                        <TextBlock Text="{Binding Path=info, Mode=TwoWay}"/>
-                    </Button>
+                    <TextBlock Text="{Binding Path=info}" MouseLeftButtonUp="TextBlock_MouseLeftButtonUp"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

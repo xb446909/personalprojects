@@ -18,18 +18,13 @@ namespace UdpCommunication
         IPEndPoint endpoint;
         public string name;
 
-        
-
-
         public RegClient(int interval_s, object obj)
         {
             timer = new System.Timers.Timer(interval_s * 1000);
             timer.Elapsed += Timer_Elapsed;
-            Timer_Elapsed(null, null);
 
             update_timer = new System.Timers.Timer(2 * interval_s * 1000);
             update_timer.Elapsed += Update_timer_Elapsed;
-            Update_timer_Elapsed(null, null);
         }
 
         private void Update_timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -48,7 +43,9 @@ namespace UdpCommunication
             endpoint = ep;
             timer.Start();
             update_timer.Start();
+            Timer_Elapsed(null, null);
+            Update_timer_Elapsed(null, null);
         }
-        
+
     }
 }
