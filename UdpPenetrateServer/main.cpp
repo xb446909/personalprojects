@@ -85,6 +85,7 @@ void ProcessMsg()
 	char tmp[5] = { 0 };
 
 	ClientInfo info = { 0 };
+	ClientInfo temp = { 0 };
 
 	if (sockfd == -1)
 	{
@@ -115,6 +116,8 @@ void ProcessMsg()
 	regmatch_t  subs[10];
 	char matched[32];
 
+	int len2 = 0;
+
 	while (1)
 	{
 		memset(recv_buf, '\0', CMD_BUF_LEN);
@@ -131,7 +134,7 @@ void ProcessMsg()
 			err = regcomp(&re, pattern, REG_EXTENDED);
 
 			if (err) {
-				len = regerror(err, &re, errbuf, sizeof(errbuf));
+				len2 = regerror(err, &re, errbuf, sizeof(errbuf));
 				printf("error: regcomp: %s\n", errbuf);
 				exit(0);
 			}
@@ -144,48 +147,47 @@ void ProcessMsg()
 				continue;
 			}
 			else if (err) {  /* 其它错误 */
-				len = regerror(err, &re, errbuf, sizeof(errbuf));
+				len2 = regerror(err, &re, errbuf, sizeof(errbuf));
 				printf("error: regexec: %s\n", errbuf);
 				exit(0);
 			}
 
-			ClientInfo temp;
-
 			temp.addr.sin_family = AF_INET;
 
-			len = subs[0].rm_eo - subs[0].rm_so;
-			memcpy(matched, recv_buf + subs[0].rm_so, len);
-			matched[len] = '\0';
+			len2 = subs[1].rm_eo - subs[1].rm_so;
+			memcpy(matched, recv_buf + subs[1].rm_so, len2);
+			matched[len2] = '\0';
 			temp.addr.sin_addr.s_addr = inet_addr(matched);
 
-			len = subs[1].rm_eo - subs[1].rm_so;
-			memcpy(matched, recv_buf + subs[1].rm_so, len);
-			matched[len] = '\0';
+			len2 = subs[2].rm_eo - subs[2].rm_so;
+			memcpy(matched, recv_buf + subs[2].rm_so, len2);
+			matched[len2] = '\0';
 			temp.addr.sin_port = htons(atoi(matched));
 
 			regfree(&re);   /* 用完了别忘了释放 */
 
 			CClientList::Get()->SendMsg(info, temp);
+			continue;
 		}
 		if (strcmp(tmp, "#REG") == 0)
 		{
 			memcpy(&info.name, &recv_buf[4], 16);
 			memcpy(&info.addr, &clientAddr, len);
 			CClientList::Get()->RegClient(info);
+			continue;
 		}
 		if (strcmp(tmp, "#LST") == 0)
 		{
 			memcpy(&info.addr, &clientAddr, len);
 			CClientList::Get()->GetClients(info);
+			continue;
 		}
-		//send_msg(clientAddr, (char*)"Received!\n");
 	}
 }
 
 void send_msg(struct sockaddr_in remoteaddr,const char* msg)
 {
-	sendto(sockfd, msg, strlen(msg), 0,
-		(struct sockaddr*)&remoteaddr, sizeof(struct sockaddr));
+	sendto(sockfd, msg, strlen(msg), 0, (struct sockaddr*)&remoteaddr, sizeof(struct sockaddr));
 }
 
 

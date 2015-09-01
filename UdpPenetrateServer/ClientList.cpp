@@ -187,7 +187,11 @@ void CClientList::RegClient(ClientInfo info)
 
 void CClientList::SendMsg(ClientInfo src, ClientInfo dst)
 {
-
+	sql.str("");
+	sql << "#MSG#SND#" << inet_ntoa(src.addr.sin_addr) << "#" << ntohs(src.addr.sin_port);
+	cout << "Send to " << inet_ntoa(dst.addr.sin_addr) << ":" << ntohs(dst.addr.sin_port) << endl;
+	send_msg(dst.addr, sql.str().c_str());
+	cout << sql.str() << endl;
 }
 
 void CClientList::GetClients(ClientInfo info)

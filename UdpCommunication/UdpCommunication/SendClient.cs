@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Timers;
+using System.Windows;
 
 namespace UdpCommunication
 {
@@ -20,6 +21,7 @@ namespace UdpCommunication
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             socket.SendTo(Encoding.Default.GetBytes("#MSG#"), endpoint);
+            //MessageBox.Show("Send MSG to " + endpoint.Address.ToString() + ":" + endpoint.Port.ToString());
         }
 
         public void StartSend(Socket so, IPEndPoint ep)

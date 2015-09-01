@@ -73,6 +73,7 @@ namespace UdpCommunication
         private static void Receive_Thread(object param)
         {
             EndPoint ep = (EndPoint)endpoint;
+            IPEndPoint temp = new IPEndPoint(0, 0);
             byte[] buf = new byte[128];
             int total, num, len;
             while (true)
@@ -88,9 +89,25 @@ namespace UdpCommunication
                     {
                         continue;
                     }
+                    if (words[1].Equals("GOT"))
+                    {
+                        MessageBox.Show("GOT");
+                        continue;
+                    }
                     if (words[1].Equals("MSG"))
                     {
-                        socket.SendTo(Encoding.Default.GetBytes("#GOT#"), ep);
+                        if (words[2].Equals("SND"))
+                        {
+                            temp.Address = IPAddress.Parse(words[3]);
+                            temp.Port = int.Parse(words[4]);
+                            socket.SendTo(Encoding.Default.GetBytes("#GOT#"), temp);
+                        }
+                        else
+                        {
+                            socket.SendTo(Encoding.Default.GetBytes("#GOT#"), ep);
+                        }
+                        MessageBox.Show("Send GOT to: " + ((IPEndPoint)ep).Address.ToString() + ":" + ((IPEndPoint)ep).Port.ToString());
+                        continue;
                     }
                     if (words[1].Equals("LST"))
                     {
@@ -131,6 +148,7 @@ namespace UdpCommunication
                                 lstbox.ItemsSource = clientlst;
                             }));
                         }
+                        continue;
                     }
                 }
                 catch (System.Exception e)
@@ -288,7 +306,6 @@ namespace UdpCommunication
             TextBlock block = sender as TextBlock;
             string text = block.Text;
             ClientInfo info = new ClientInfo(text);
-            MessageBox.Show(info.ip);
 
             m_sendclient.StartSend(socket, info.endpoint);
             socket.SendTo(Encoding.Default.GetBytes("#MSG#" + info.info), endpoint);
