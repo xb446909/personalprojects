@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
+#include <regex.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -108,6 +109,12 @@ void ProcessMsg()
 	struct sockaddr_in clientAddr;
 	int len = sizeof(clientAddr);
 
+	regex_t re;
+	char pattern[] = "([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}):([0-9]+$)";
+	char errbuf[128];
+	regmatch_t  subs[10];
+	char matched[32];
+
 	while (1)
 	{
 		memset(recv_buf, '\0', CMD_BUF_LEN);
@@ -117,7 +124,49 @@ void ProcessMsg()
 		//printf("recvfrom %s:%d length: %d, recv: %s\n",	inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port,read_len, recv_buf);
 
 		memcpy(tmp, recv_buf, 4);
+		if (strcmp(tmp, "#MSG") == 0)
+		{
+			memcpy(&info.addr, &clientAddr, len);
 
+			err = regcomp(&re, pattern, REG_EXTENDED);
+
+			if (err) {
+				len = regerror(err, &re, errbuf, sizeof(errbuf));
+				printf("error: regcomp: %s\n", errbuf);
+				exit(0);
+			}
+
+			err = regexec(&re, recv_buf, (size_t)10, subs, 0);
+
+			if (err == REG_NOMATCH) { /* 没有匹配成功 */
+				printf("Sorry, no match ...\n");
+				regfree(&re);
+				continue;
+			}
+			else if (err) {  /* 其它错误 */
+				len = regerror(err, &re, errbuf, sizeof(errbuf));
+				printf("error: regexec: %s\n", errbuf);
+				exit(0);
+			}
+
+			ClientInfo temp;
+
+			temp.addr.sin_family = AF_INET;
+
+			len = subs[0].rm_eo - subs[0].rm_so;
+			memcpy(matched, recv_buf + subs[0].rm_so, len);
+			matched[len] = '\0';
+			temp.addr.sin_addr.s_addr = inet_addr(matched);
+
+			len = subs[1].rm_eo - subs[1].rm_so;
+			memcpy(matched, recv_buf + subs[1].rm_so, len);
+			matched[len] = '\0';
+			temp.addr.sin_port = htons(atoi(matched));
+
+			regfree(&re);   /* 用完了别忘了释放 */
+
+			CClientList::Get()->SendMsg(info, temp);
+		}
 		if (strcmp(tmp, "#REG") == 0)
 		{
 			memcpy(&info.name, &recv_buf[4], 16);

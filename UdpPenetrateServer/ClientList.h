@@ -29,6 +29,7 @@ public:
 	void test();
 	void RegClient(ClientInfo info);
 	void GetClients(ClientInfo info);
+	void SendMsg(ClientInfo src, ClientInfo dst);
 };
 
 

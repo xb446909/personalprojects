@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,6 +31,7 @@ namespace UdpCommunication
         Rect normal_rect;
         Brush default_brush = new SolidColorBrush(Color.FromRgb(0xcc, 0xcc, 0xcc));//new SolidColorBrush(Color.FromRgb(83, 92, 168));
 
+        SendClient m_sendclient;
         NameWindow m_name;
         RegClient m_regclient;
         Setting setting;
@@ -57,7 +59,8 @@ namespace UdpCommunication
             minimize = MainGrid.FindName("Minimize") as Canvas;
             restore.Visibility = Visibility.Collapsed;
             Background = default_brush;
-            
+
+            m_sendclient = new SendClient(interval_s);
             m_regclient = new RegClient(interval_s, ClientList);
             recv_thread = new Thread(Receive_Thread);
 
@@ -71,7 +74,7 @@ namespace UdpCommunication
         {
             EndPoint ep = (EndPoint)endpoint;
             byte[] buf = new byte[128];
-            int num, len;
+            int total, num, len;
             while (true)
             {
                 num = 0;
@@ -80,37 +83,60 @@ namespace UdpCommunication
                 {
                     len = socket.ReceiveFrom(buf, ref ep);
                     string str = Encoding.Default.GetString(buf, 0, len);
-                    string sub = str.Substring(0, 4);
-                    if (sub.Equals("#LST"))
+                    string[] words = Regex.Split(str, "#");
+                    if (words.Length == 1)
                     {
-
+                        continue;
                     }
-                    num = buf[0] - 48;
-
-                    Dispatcher.FromThread((Thread)param).Invoke(new Action(() =>
+                    if (words[1].Equals("MSG"))
                     {
-                        lstbox.ItemsSource = null;
-                    }));
-                    clientlst.Clear();
-
-                    if (num > 0)
+                        socket.SendTo(Encoding.Default.GetBytes("#GOT#"), ep);
+                    }
+                    if (words[1].Equals("LST"))
                     {
-                        for (int i = 0; i < num; i++)
+                        if (int.TryParse(words[2], out total) == false)
                         {
-                            len = socket.ReceiveFrom(buf, ref ep);
-                            clientlst.Add(new ClientInfo(Encoding.Default.GetString(buf, 0, len)));
+                            continue;
+                        }
+                        if (total == 0)
+                        {
+                            Dispatcher.FromThread((Thread)param).Invoke(new Action(() =>
+                            {
+                                lstbox.ItemsSource = null;
+                            }));
+                            clientlst.Clear();
+                            Dispatcher.FromThread((Thread)param).Invoke(new Action(() =>
+                            {
+                                lstbox.ItemsSource = clientlst;
+                            }));
+                            continue;
+                        }
+                        if (int.TryParse(words[3], out num) == false)
+                        {
+                            continue;
+                        }
+                        if (num == 1)
+                        {
+                            Dispatcher.FromThread((Thread)param).Invoke(new Action(() =>
+                            {
+                                lstbox.ItemsSource = null;
+                            }));
+                            clientlst.Clear();
+                        }
+                        clientlst.Add(new ClientInfo(words[4]));
+                        if (total == num)
+                        {
+                            Dispatcher.FromThread((Thread)param).Invoke(new Action(() =>
+                            {
+                                lstbox.ItemsSource = clientlst;
+                            }));
                         }
                     }
-
-                    Dispatcher.FromThread((Thread)param).Invoke(new Action(() =>
-                    {
-                        lstbox.ItemsSource = clientlst;
-                    }));
                 }
                 catch (System.Exception e)
                 {
                     //MessageBox.Show(e.Message.ToString());
-                    return;
+                    //return;
                 }
             }
         }
@@ -183,6 +209,36 @@ namespace UdpCommunication
             {
                 port = Convert.ToInt32(setting.Text_Port.Text);
                 host = setting.Text_Server.Text;
+
+
+                m_regclient.StopFlap();
+                socket.Close();
+                recv_thread.Abort();
+
+                socket = new Socket(SocketType.Dgram, ProtocolType.Udp);
+
+                int index = -1;
+                var address = Dns.GetHostEntry(host);
+                for (int i = 0; i < address.AddressList.Length; i++)
+                {
+                    if (address.AddressList[i].AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index == -1)
+                {
+                    MessageBox.Show("无法从" + host + "获得IP地址.");
+                    return;
+                }
+
+                endpoint = new IPEndPoint(address.AddressList[index], port);
+                socket.Connect(endpoint);
+
+                m_regclient.StartFlap(socket, endpoint);
+                recv_thread = new Thread(Receive_Thread);
+                recv_thread.Start(Thread.CurrentThread);
             }
         }
 
@@ -221,11 +277,6 @@ namespace UdpCommunication
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             socket.Close();
@@ -234,17 +285,52 @@ namespace UdpCommunication
 
         private void TextBlock_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            TextBlock block = sender as TextBlock;
+            string text = block.Text;
+            ClientInfo info = new ClientInfo(text);
+            MessageBox.Show(info.ip);
 
+            m_sendclient.StartSend(socket, info.endpoint);
+            socket.SendTo(Encoding.Default.GetBytes("#MSG#" + info.info), endpoint);
         }
     }
 
     internal class ClientInfo 
     {
+        string[] words;
         public string info { get; set; }
-
+        public string name
+        {
+            get
+            {
+                return words[0];
+            }
+        }
+        public string ip
+        {
+            get
+            {
+                return words[1];
+            }
+        }
+        public string port
+        {
+            get
+            {
+                return words[2];
+            }
+        }
+        public IPEndPoint endpoint
+        {
+            get
+            {
+                return new IPEndPoint(IPAddress.Parse(ip), int.Parse(port));
+            }
+        }
         public ClientInfo(string client_info)
         {
             info = client_info;
+            words = Regex.Split(info, "[\\ :]");
         }
     }
 }

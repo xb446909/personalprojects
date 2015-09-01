@@ -1,29 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Timers;
-using System.Windows;
-using System.Windows.Controls;
 
 namespace UdpCommunication
 {
     internal class RegClient
     {
-        System.Timers.Timer timer;
-        System.Timers.Timer update_timer;
+        Timer timer;
+        Timer update_timer;
         Socket socket;
         IPEndPoint endpoint;
         public string name;
 
         public RegClient(int interval_s, object obj)
         {
-            timer = new System.Timers.Timer(interval_s * 1000);
+            timer = new Timer(interval_s * 1000);
             timer.Elapsed += Timer_Elapsed;
 
-            update_timer = new System.Timers.Timer(2 * interval_s * 1000);
+            update_timer = new Timer(2 * interval_s * 1000);
             update_timer.Elapsed += Update_timer_Elapsed;
         }
 
@@ -45,6 +40,12 @@ namespace UdpCommunication
             update_timer.Start();
             Timer_Elapsed(null, null);
             Update_timer_Elapsed(null, null);
+        }
+
+        public void StopFlap()
+        {
+            timer.Close();
+            update_timer.Close();
         }
 
     }

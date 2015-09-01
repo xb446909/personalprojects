@@ -29,7 +29,6 @@ CClientList::~CClientList()
 CClientList* CClientList::m_clientList = 0;
 
 extern void send_msg(struct sockaddr_in remoteaddr,const char* msg);
-extern void send_clientinfo(struct sockaddr_in remoteaddr, int num, ClientInfo* pInfo);
 
 static int callback(void *nEvent, int argc, char **argv, char **azColName)
 {
@@ -186,6 +185,11 @@ void CClientList::RegClient(ClientInfo info)
 	cout << info.name << " from " << inet_ntoa(info.addr.sin_addr) << ":" << ntohs(info.addr.sin_port) << endl;
 }
 
+void CClientList::SendMsg(ClientInfo src, ClientInfo dst)
+{
+
+}
+
 void CClientList::GetClients(ClientInfo info)
 {
 	time_t t;
@@ -213,20 +217,20 @@ void CClientList::GetClients(ClientInfo info)
 		exit(0);
 	}
 
-	sql.str("");
-	sql << nrow;
-
-	send_msg(info.addr, sql.str().c_str());
-
 	if (nrow > 0)
 	{
 		for (int i = 1; i <= nrow; i++)
 		{
 			sql.str("");
+			sql << "#LST#" << nrow << "#" <<i << "#";
 			sql << azResult[i * 4] << " " << azResult[i * 4 + 1] << ":" << azResult[i * 4 + 2];
 			send_msg(info.addr, sql.str().c_str());
 
 			cout << sql.str() << endl;
 		}
+	}
+	else
+	{
+		send_msg(info.addr, "#LST#0#0#");
 	}
 }
